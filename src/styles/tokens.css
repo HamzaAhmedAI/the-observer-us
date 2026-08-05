@@ -1,0 +1,182 @@
+/* ============================================================
+   The Observer US — Design Tokens
+   Warm, premium palette for an editorial news experience.
+   ============================================================ */
+
+:root {
+  /* ========================================
+     Brand Colors — Refined Crimson
+     ======================================== */
+  --color-brand: #dc2626;
+  --color-brand-hover: #b91c1c;
+  --color-brand-light: #fef1ee;
+  --color-brand-dark: #7f1d1d;
+  --color-brand-subtle: rgba(220, 38, 38, 0.06);
+
+  /* ========================================
+     Surface Colors — Warm Paper
+     Premium news sites use warm off-whites,
+     not clinical pure white.
+     ======================================== */
+  --color-surface: #faf8f5;
+  --color-surface-alt: #f2eee8;
+  --color-surface-elevated: #ffffff;
+  --color-surface-hover: #ebe6de;
+
+  /* ========================================
+     Text Colors — Warm Charcoal
+     Pure navy/black text on warm paper feels
+     harsh. A warm near-black is easier to read
+     and feels intentional.
+     ======================================== */
+  --color-text-primary: #1a1614;
+  --color-text-secondary: #6b6359;
+  --color-text-tertiary: #9e958a;
+  --color-text-on-brand: #ffffff;
+  --color-text-link: #dc2626;
+
+  /* ========================================
+     Border Colors
+     ======================================== */
+  --color-border: #e4ddd4;
+  --color-border-light: #eeebe6;
+  --color-border-heavy: #cdc4b8;
+
+  /* ========================================
+     Category Colors — Slightly richer
+     ======================================== */
+  --color-politics: #2563eb;
+  --color-tech: #059669;
+  --color-sports: #ea580c;
+  --color-entertainment: #8b5cf6;
+  --color-business: #0891b2;
+  --color-health: #e11d48;
+  --color-science: #65a30d;
+  --color-world: #4f46e5;
+
+  /* ========================================
+     Typography
+     ======================================== */
+  --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+
+  /* ========================================
+     Spacing Scale
+     ======================================== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --space-section: clamp(4rem, 8vw, 8rem);
+
+  /* ========================================
+     Border Radius — Softer, premium touch
+     ======================================== */
+  --radius-none: 0;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* ========================================
+     Shadows — Tinted warm, never pure black
+     Pure black shadows (rgb 0 0 0) look dirty
+     on warm paper. Tint to the surface hue.
+     ======================================== */
+  --shadow-card: 0 1px 3px rgba(26, 22, 20, 0.04), 0 1px 2px rgba(26, 22, 20, 0.06);
+  --shadow-elevated: 0 4px 16px rgba(26, 22, 20, 0.08), 0 2px 4px rgba(26, 22, 20, 0.04);
+  --shadow-dropdown: 0 10px 40px rgba(26, 22, 20, 0.12), 0 2px 8px rgba(26, 22, 20, 0.06);
+  --shadow-sticky: 0 1px 3px rgba(26, 22, 20, 0.04);
+
+  /* ========================================
+     Z-Index Scale
+     ======================================== */
+  --z-base: 0;
+  --z-dropdown: 50;
+  --z-sticky: 100;
+  --z-nav: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+
+  /* ========================================
+     Animation
+     ======================================== */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   Dark Mode — Warm Charcoal
+   Instead of cold navy/black, use a warm
+   charcoal that feels sophisticated.
+   ======================================== */
+.dark {
+  --color-brand: #ef4444;
+  --color-brand-hover: #f87171;
+  --color-brand-light: #2d0a08;
+  --color-brand-dark: #fecaca;
+  --color-brand-subtle: rgba(239, 68, 68, 0.08);
+
+  --color-surface: #1a1816;
+  --color-surface-alt: #24211d;
+  --color-surface-elevated: #2a2622;
+  --color-surface-hover: #322e29;
+
+  --color-text-primary: #ece7e1;
+  --color-text-secondary: #a0988e;
+  --color-text-tertiary: #736b61;
+  --color-text-on-brand: #ffffff;
+  --color-text-link: #ef4444;
+
+  --color-border: #322e29;
+  --color-border-light: #24211d;
+  --color-border-heavy: #403b35;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-sticky: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   Reduced Motion
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+/* ========================================
+   Focus Styles
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
