@@ -2,7 +2,7 @@
    The Observer US — Root Layout
    ============================================================ */
 
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { FontProvider } from '@/lib/fonts'
 import { DEFAULT_METADATA } from '@/lib/seo'
 import { Header } from '@/components/ui/Header'
@@ -11,6 +11,12 @@ import { WebVitals } from '@/components/analytics/WebVitals'
 import './globals.css'
 
 export const metadata: Metadata = DEFAULT_METADATA
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#dc2626',
+}
 
 export default function RootLayout({
   children,

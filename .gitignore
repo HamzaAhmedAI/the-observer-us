@@ -42,3 +42,10 @@ next-env.d.ts
 
 # build logs
 /build.log
+
+# lighthouse audit outputs
+/baseline-prod.json
+/after-prod.json
+/after-warm.json
+localhost_3000-*.json
+localhost_3000-*.html

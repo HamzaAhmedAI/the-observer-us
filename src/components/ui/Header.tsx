@@ -114,13 +114,14 @@ export function Header() {
             </button>
           )}
 
-          {/* Mobile Menu Hamburger — label toggles the checkbox */}
+          {/* Mobile Menu Hamburger — label toggles the checkbox.
+              aria-label is prohibited on <label>; use visually hidden text instead. */}
           <label
             htmlFor={MENU_ID}
             className="flex h-11 w-11 cursor-pointer select-none items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] transition-all duration-[var(--duration-fast)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] active:bg-[var(--color-surface-hover)] lg:hidden"
-            aria-label="Open menu"
           >
-            {menuOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
+            <span className="sr-only">{menuOpen ? 'Close menu' : 'Open menu'}</span>
+            {menuOpen ? <X size={20} weight="bold" aria-hidden="true" /> : <List size={20} weight="bold" aria-hidden="true" />}
           </label>
         </div>
       </div>

@@ -54,6 +54,7 @@ export function ArticleCard({
           }
           className="object-cover transition-transform duration-[var(--duration-slow)] group-hover:scale-[1.05]"
           priority={priority}
+          fetchPriority={priority ? 'high' : undefined}
           loading={priority ? undefined : 'lazy'}
         />
         {/* Subtle image overlay */}

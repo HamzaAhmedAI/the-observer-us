@@ -27,10 +27,14 @@ export default async function HomePage() {
   let categories: Category[] = []
 
   try {
-    const articles = await getArticles({ limit: 10 })
+    // Fetch articles and categories in parallel — both are independent.
+    const [articles, cats] = await Promise.all([
+      getArticles({ limit: 10 }),
+      getCategories(),
+    ])
     featuredArticle = articles.data[0] ?? null
     latestArticles = articles.data.slice(1, 7)
-    categories = await getCategories()
+    categories = cats
   } catch (error) {
     console.error('Failed to load homepage data:', error)
   }
@@ -42,6 +46,9 @@ export default async function HomePage() {
 
   return (
     <div className="container-news py-8 md:py-12">
+      {/* Site title — visually hidden, establishes the h1 for screen readers */}
+      <h1 className="sr-only">The Observer US — breaking news, in-depth analysis, and stories that matter</h1>
+
       {/* Featured Hero */}
       {featuredArticle ? (
         <FeaturedHero article={featuredArticle} />
@@ -64,8 +71,8 @@ export default async function HomePage() {
 
         {latestArticles.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {latestArticles.map((article, i) => (
-              <ArticleCard key={article.id} article={article} priority={i < 3} />
+            {latestArticles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
             ))}
           </div>
         ) : (

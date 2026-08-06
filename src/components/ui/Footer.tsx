@@ -54,9 +54,9 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
           {/* Categories */}
           <div>
-            <h4 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
               Categories
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {FOOTER_CATEGORIES.map((cat) => (
                 <li key={cat.href}>
@@ -75,9 +75,9 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h4 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
               Company
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
@@ -96,9 +96,9 @@ export function Footer() {
 
           {/* RSS / Sitemap */}
           <div>
-            <h4 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
               Follow
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               <li>
                 <Link
@@ -125,9 +125,9 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
               Legal
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
                 <li key={item}>
