@@ -45,8 +45,9 @@ export function middleware(request: NextRequest) {
 }
 
 // Only run middleware on page routes and API routes
+// (excluding the Payload admin UI, which manages its own security)
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|admin).*)',
   ],
 }

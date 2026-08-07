@@ -9,10 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@payloadcms/db-postgres": "^3.87.1",
+    "@payloadcms/next": "^3.87.1",
+    "@payloadcms/storage-vercel-blob": "^3.87.1",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/supabase-js": "^2",
     "motion": "^11",
     "next": "16.2.12",
+    "payload": "^3.87.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^4",
@@ -28,5 +32,12 @@
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true
   }
 }

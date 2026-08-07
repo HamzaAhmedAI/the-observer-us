@@ -56,12 +56,29 @@ export async function getArticles(options?: {
   }
 
   const params = new URLSearchParams()
-  if (options?.category) params.set('category', options.category)
+  if (options?.category) params.set('where[category.slug][equals]', options.category)
   if (options?.limit) params.set('limit', String(options.limit))
   if (options?.page) params.set('page', String(options.page))
-  if (options?.featured) params.set('featured', 'true')
+  if (options?.featured) params.set('where[isFeatured][equals]', 'true')
+  params.set('where[_status][equals]', 'published')
+  params.set('depth', '2')
+  params.set('sort', '-publishedAt')
 
-  return fetchCMS<PaginatedResponse<Article>>(`/articles?${params.toString()}`)
+  const result = await fetchCMS<{
+    docs: Article[]
+    totalDocs: number
+    page: number
+    limit: number
+    hasNextPage: boolean
+  }>(`/articles?${params.toString()}`)
+
+  return {
+    data: result.docs,
+    total: result.totalDocs,
+    page: result.page,
+    pageSize: result.limit,
+    hasMore: result.hasNextPage,
+  }
 }
 
 export async function getArticleBySlug(
@@ -74,7 +91,7 @@ export async function getArticleBySlug(
 
   try {
     const result = await fetchCMS<{ docs: Article[] }>(
-      `/articles?where[slug][equals]=${slug}&where[category.slug][equals]=${category}&limit=1`,
+      `/articles?where[slug][equals]=${encodeURIComponent(slug)}&where[category.slug][equals]=${encodeURIComponent(category)}&where[_status][equals]=published&limit=1&depth=2`,
       undefined,
       REVALIDATE_ARTICLE
     )
@@ -90,7 +107,7 @@ export async function getCategories(): Promise<Category[]> {
   }
 
   try {
-    const result = await fetchCMS<{ docs: Category[] }>('/categories')
+    const result = await fetchCMS<{ docs: Category[] }>('/categories?limit=100&sort=name')
     return result.docs
   } catch {
     return []

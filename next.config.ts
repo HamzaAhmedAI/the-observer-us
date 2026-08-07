@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
+import { withPayload } from "@payloadcms/next/withPayload";
 
-const nextConfig: NextConfig = {
+const nextConfig: NextConfig = withPayload({
   images: {
     // Allow picsum.photos for development mock data
     remotePatterns: [
@@ -57,6 +58,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-};
+});
 
 export default nextConfig;
