@@ -48,6 +48,9 @@ export default buildConfig({
         process.env.DATABASE_URL ||
         '',
     },
+    // Auto-create/update tables on boot (dev-style push).
+    // Replace with proper `payload migrate` in production later.
+    push: true,
   }),
 
   // ─── Storage (Vercel Blob for media uploads) ──────────────
