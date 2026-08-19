@@ -1,0 +1,21 @@
+# The Observer US — Caddy reverse proxy (free automatic HTTPS)
+# Caddy obtains + renews Let's Encrypt certs for you.
+
+theobserverus.com, www.theobserverus.com {
+    encode zstd gzip
+
+    # Proxy everything to the Next.js/Payload server on :3000
+    reverse_proxy 127.0.0.1:3000
+
+    # Security headers (matches app headers; belt + suspenders)
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    # Serve Payload media uploads (staticDir) with long cache
+    @media path /media/*
+    header @media Cache-Control "public, max-age=604800"
+}

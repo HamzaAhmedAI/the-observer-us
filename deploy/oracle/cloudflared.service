@@ -1,0 +1,15 @@
+[Unit]
+Description=Cloudflare Tunnel for The Observer US
+After=network.target
+
+[Service]
+Type=simple
+User=opc
+# Creates a tunnel named "observer" (run `cloudflared tunnel login` once first).
+# Ingress: https://theobserverus.com -> http://localhost:3000
+ExecStart=/usr/bin/cloudflared tunnel --config /opt/observer/cloudflared.yml run observer
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
