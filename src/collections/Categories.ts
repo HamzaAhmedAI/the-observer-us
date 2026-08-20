@@ -52,7 +52,7 @@ export const Categories: CollectionConfig = {
         if (!doc?.id) return doc
         const { totalDocs } = await req.payload.count({
           collection: 'articles',
-          where: { 'category.value': { equals: doc.id } },
+          where: { category: { equals: doc.id } },
         })
         return { ...doc, articleCount: totalDocs }
       },

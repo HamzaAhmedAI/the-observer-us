@@ -5,6 +5,8 @@
 import { getArticles } from '@/lib/cms'
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/seo'
 
+const LOGO_URL = `${SITE_URL}/logo.png`
+
 export async function GET() {
   const articles = await getArticles({ limit: 20 })
 
@@ -35,6 +37,11 @@ export async function GET() {
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>${LOGO_URL}</url>
+      <title>${SITE_NAME}</title>
+      <link>${SITE_URL}</link>
+    </image>
     ${items}
   </channel>
 </rss>`

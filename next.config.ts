@@ -3,6 +3,10 @@ import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = withPayload({
   images: {
+    // Payload serves media via /api/media/file/... which Next's image
+    // optimizer refuses to process (same-origin /api route). Disable
+    // on-the-fly optimization so next/image emits the raw URL directly.
+    unoptimized: true,
     remotePatterns: [
       // Local media served by Payload's staticDir on this VM.
       { protocol: "https", hostname: "**.theobserverus.com" },

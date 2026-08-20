@@ -11,6 +11,19 @@ import type { Article, Category, PaginatedResponse } from '@/types/article'
 import {
   REVALIDATE_ARTICLE,
 } from '@/lib/revalidate'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+
+// Payload 3.87.1's REST query-string `where` parser is broken for several
+// field paths (e.g. `where[slug]`, `where[isFeatured]`, `where[category.slug]`
+// all 400 / return empty). Use the LOCAL Payload API instead — it talks to the
+// DB directly and doesn't go through the buggy REST parser. Cached per process.
+let _payload: Awaited<ReturnType<typeof getPayload>> | null = null
+type P = Awaited<ReturnType<typeof getPayload>>
+async function getP(): Promise<P> {
+  if (!_payload) _payload = await getPayload({ config })
+  return _payload
+}
 
 // ─── Configuration ──────────────────────────────────────────
 const CMS_API_URL = process.env.CMS_API_URL ?? ''
@@ -55,30 +68,45 @@ export async function getArticles(options?: {
     return getMockArticles(options)
   }
 
-  const params = new URLSearchParams()
-  if (options?.category) params.set('where[category.slug][equals]', options.category)
-  if (options?.limit) params.set('limit', String(options.limit))
-  if (options?.page) params.set('page', String(options.page))
-  if (options?.featured) params.set('where[isFeatured][equals]', 'true')
-  params.set('where[_status][equals]', 'published')
-  params.set('depth', '2')
-  params.set('sort', '-publishedAt')
+  const where: Record<string, unknown> = { _status: { equals: 'published' } }
+  if (options?.category) where['category.slug'] = { equals: options.category }
+  if (options?.featured) where['isFeatured'] = { equals: true }
 
-  const result = await fetchCMS<{
+  const payload = await getP()
+  const result = (await payload.find({
+    collection: 'articles',
+    where: where as import('payload').Where,
+    depth: 2,
+    sort: '-publishedAt',
+    limit: options?.limit ?? 12,
+    page: options?.page ?? 1,
+  })) as unknown as {
     docs: Article[]
     totalDocs: number
     page: number
     limit: number
     hasNextPage: boolean
-  }>(`/articles?${params.toString()}`)
+  }
 
   return {
-    data: result.docs,
+    data: result.docs.map(normalizeTags),
     total: result.totalDocs,
     page: result.page,
     pageSize: result.limit,
     hasMore: result.hasNextPage,
   }
+}
+
+// Payload returns `tags` as [{ id, tag }] objects at depth>=1. The Article
+// type (and the UI) expect string[]. Convert defensively.
+function normalizeTags<T extends Article>(a: T): T {
+  const tags = (a as Article).tags as unknown as Array<string | { tag?: string }> | undefined
+  if (Array.isArray(tags)) {
+    ;(a as Article).tags = tags
+      .map((t) => (typeof t === 'string' ? t : (t as { tag?: string })?.tag ?? ''))
+      .filter(Boolean) as string[]
+  }
+  return a
 }
 
 export async function getArticleBySlug(
@@ -90,12 +118,19 @@ export async function getArticleBySlug(
   }
 
   try {
-    const result = await fetchCMS<{ docs: Article[] }>(
-      `/articles?where[slug][equals]=${encodeURIComponent(slug)}&where[category.slug][equals]=${encodeURIComponent(category)}&where[_status][equals]=published&limit=1&depth=2`,
-      undefined,
-      REVALIDATE_ARTICLE
-    )
-    return result.docs[0] ?? null
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'articles',
+      where: {
+        slug: { equals: slug },
+        'category.slug': { equals: category },
+        _status: { equals: 'published' },
+      } as import('payload').Where,
+      depth: 2,
+      limit: 1,
+    })
+    const doc = (result.docs as Article[])[0]
+    return doc ? normalizeTags(doc) : null
   } catch {
     return null
   }
@@ -107,8 +142,14 @@ export async function getCategories(): Promise<Category[]> {
   }
 
   try {
-    const result = await fetchCMS<{ docs: Category[] }>('/categories?limit=100&sort=name')
-    return result.docs
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'categories',
+      depth: 0,
+      sort: 'name',
+      limit: 100,
+    })
+    return result.docs as Category[]
   } catch {
     return []
   }

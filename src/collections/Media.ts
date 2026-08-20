@@ -19,7 +19,10 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   upload: {
-    staticDir: 'media',
+    // Serve media as static files from public/media so Next.js image
+    // optimization can process them (the default /api/media/file path is
+    // rejected by Next's optimizer as a same-origin /api route).
+    staticDir: 'public/media',
     imageSizes: [
       {
         name: 'card',
