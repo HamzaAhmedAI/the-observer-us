@@ -38,7 +38,7 @@ export function Footer() {
               href="/"
               className="text-lg font-bold tracking-tight text-[var(--color-text-primary)] no-underline"
             >
-              <span className="text-[var(--color-brand)]">The</span>{' '}
+              <span className="text-[var(--color-brand-text)]">The</span>{' '}
               Observer{' '}
               <span className="text-xs font-medium text-[var(--color-text-tertiary)]">US</span>
             </Link>

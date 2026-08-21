@@ -18,17 +18,27 @@ export function middleware(request: NextRequest) {
 
   const csp = [
     `default-src 'self'`,
-    `script-src ${scriptSrc}`,
+    `script-src ${scriptSrc} https://static.cloudflareinsights.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
-    "connect-src 'self' https:",
+    "connect-src 'self' https: https://static.cloudflareinsights.com",
     "frame-src 'none'",
     "object-src 'none'",
     'base-uri \'self\'',
   ].join('; ')
 
   response.headers.set('Content-Security-Policy', csp)
+
+  // Immortal caching for uploaded media (static binaries, content-addressed
+  // by filename). Long TTL removes the Lighthouse 'cache lifetime' penalty.
+  if (request.nextUrl.pathname.startsWith('/api/media')) {
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable'
+    )
+  }
+
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')

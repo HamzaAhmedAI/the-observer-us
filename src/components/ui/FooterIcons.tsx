@@ -25,7 +25,7 @@ export function FooterNewsletterLink() {
         Stay informed —{' '}
         <Link
           href="/#subscribe"
-          className="font-medium text-[var(--color-text-link)] no-underline hover:underline"
+          className="font-medium text-[var(--color-brand-text)] no-underline hover:underline"
         >
           subscribe to our newsletter
         </Link>
