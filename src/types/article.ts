@@ -33,9 +33,12 @@ export interface Author {
   id: string
   slug: string
   name: string
-  avatar: Media
+  avatar: Media | null
   bio: string
   role: string
+  linkedin?: string | null
+  twitter?: string | null
+  website?: string | null
 }
 
 export interface Media {

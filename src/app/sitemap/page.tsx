@@ -67,7 +67,12 @@ export default async function SitemapPage() {
                   <span className="rounded-full bg-[var(--color-surface)] px-2 py-0.5 font-medium">
                     {article.category.name}
                   </span>
-                  <span>{article.author.name}</span>
+                  <Link
+                    href={`/author/${article.author.slug}`}
+                    className="hover:text-[var(--color-brand)] hover:underline"
+                  >
+                    {article.author.name}
+                  </Link>
                   <span>
                     {new Date(article.publishedAt).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -80,6 +85,22 @@ export default async function SitemapPage() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+          Authors
+        </h2>
+        <ul className="mt-4 flex flex-wrap gap-3">
+          <li>
+            <Link
+              href="/author/hamza-ahmed"
+              className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-brand)] hover:underline"
+            >
+              Hamza Ahmed — Founder &amp; Editor-in-Chief
+            </Link>
+          </li>
+        </ul>
       </section>
 
       <footer className="mt-12 border-t border-[var(--color-border)] pt-6 text-sm text-[var(--color-text-secondary)]">

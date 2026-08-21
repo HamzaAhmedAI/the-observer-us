@@ -136,13 +136,31 @@ export default async function ArticlePage({ params }: Props) {
             {/* Meta */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
               <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-surface-alt)]">
-                  <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,128,48ZM128,152c-43.4,0-80,17.6-80,40v16a8,8,0,0,0,8,8H200a8,8,0,0,0,8-8V192C208,169.6,171.4,152,128,152Zm64,48H64V192c0-14.4,29.6-24,64-24s64,9.6,64,24v8Z"/></svg>
-                </div>
+                <Link
+                  href={`/author/${article.author.slug}`}
+                  className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[var(--color-surface-alt)]"
+                  aria-label={`Author profile: ${article.author.name}`}
+                >
+                  {article.author.avatar?.url ? (
+                    <Image
+                      src={article.author.avatar.url}
+                      alt={article.author.name}
+                      width={article.author.avatar.width || 40}
+                      height={article.author.avatar.height || 40}
+                      className="h-10 w-10 rounded-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,128,48ZM128,152c-43.4,0-80,17.6-80,40v16a8,8,0,0,0,8,8H200a8,8,0,0,0,8-8V192C208,169.6,171.4,152,128,152Zm64,48H64V192c0-14.4,29.6-24,64-24s64,9.6,64,24v8Z"/></svg>
+                  )}
+                </Link>
                 <div>
-                  <span className="block font-medium text-[var(--color-text-primary)]">
+                  <Link
+                    href={`/author/${article.author.slug}`}
+                    className="block font-medium text-[var(--color-text-primary)] hover:text-[var(--color-accent)] hover:underline"
+                  >
                     {article.author.name}
-                  </span>
+                  </Link>
                   <span className="text-xs">{article.author.role}</span>
                 </div>
               </div>
@@ -191,12 +209,23 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* Author Bio */}
           <div className="mt-12 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-surface-hover)]">
-                <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor"><path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,128,48ZM128,152c-43.4,0-80,17.6-80,40v16a8,8,0,0,0,8,8H200a8,8,0,0,0,8-8V192C208,169.6,171.4,152,128,152Zm64,48H64V192c0-14.4,29.6-24,64-24s64,9.6,64,24v8Z"/></svg>
+            <Link href={`/author/${article.author.slug}`} className="flex items-start gap-4 group">
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
+                {article.author.avatar?.url ? (
+                  <Image
+                    src={article.author.avatar.url}
+                    alt={article.author.name}
+                    width={article.author.avatar.width || 48}
+                    height={article.author.avatar.height || 48}
+                    className="h-12 w-12 rounded-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor"><path d="M128,128a48,48,0,1,0-48-48A48,48,0,0,0,128,128Zm0-80a32,32,0,1,1-32,32A32,32,0,0,1,128,48ZM128,152c-43.4,0-80,17.6-80,40v16a8,8,0,0,0,8,8H200a8,8,0,0,0,8-8V192C208,169.6,171.4,152,128,152Zm64,48H64V192c0-14.4,29.6-24,64-24s64,9.6,64,24v8Z"/></svg>
+                )}
               </div>
               <div>
-                <p className="font-semibold text-[var(--color-text-primary)]">
+                <p className="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] group-hover:underline">
                   {article.author.name}
                 </p>
                 <p className="text-sm text-[var(--color-text-tertiary)]">{article.author.role}</p>
@@ -204,7 +233,7 @@ export default async function ArticlePage({ params }: Props) {
                   {article.author.bio}
                 </p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Tags */}

@@ -7,7 +7,7 @@
    stays unchanged.
    ============================================================ */
 
-import type { Article, Category, PaginatedResponse } from '@/types/article'
+import type { Article, Author, Category, Media, PaginatedResponse } from '@/types/article'
 import {
   REVALIDATE_ARTICLE,
 } from '@/lib/revalidate'
@@ -155,6 +155,62 @@ export async function getCategories(): Promise<Category[]> {
   }
 }
 
+// ─── Author Operations ──────────────────────────────────────
+export async function getAuthorBySlug(slug: string): Promise<Author | null> {
+  if (USE_MOCK) {
+    return MOCK_AUTHORS.find((a) => a.slug === slug) ?? null
+  }
+
+  try {
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'authors',
+      where: { slug: { equals: slug } } as import('payload').Where,
+      depth: 1,
+      limit: 1,
+    })
+    const doc = (result.docs as Author[])[0]
+    if (!doc) return null
+    // Normalize avatar: payload returns { id } when depth<2; fetch media if needed.
+    if (doc.avatar && typeof doc.avatar === 'object' && !(doc.avatar as Media).url) {
+      const mediaResult = await payload.findByID({
+        collection: 'media',
+        id: (doc.avatar as unknown as { id: string }).id,
+      })
+      doc.avatar = mediaResult as unknown as Media
+    }
+    return doc
+  } catch {
+    return null
+  }
+}
+
+export async function getArticlesByAuthor(
+  authorSlug: string,
+  limit = 50,
+): Promise<Article[]> {
+  if (USE_MOCK) {
+    return getMockArticles({ limit }).data.filter((a) => a.author.slug === authorSlug)
+  }
+
+  try {
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'articles',
+      where: {
+        'author.slug': { equals: authorSlug },
+        _status: { equals: 'published' },
+      } as import('payload').Where,
+      depth: 2,
+      sort: '-publishedAt',
+      limit,
+    })
+    return (result.docs as Article[]).map(normalizeTags)
+  } catch {
+    return []
+  }
+}
+
 // ─── Mock Data for Development ───────────────────────────────
 function getMockCategories(): Category[] {
   return [
@@ -173,6 +229,7 @@ const MOCK_AUTHORS = [
   { id: 'a1', slug: 'sarah-chen', name: 'Sarah Chen', avatar: { url: '/images/author-1.jpg', width: 100, height: 100, alt: 'Sarah Chen' }, bio: 'Senior political correspondent.', role: 'Senior Correspondent' },
   { id: 'a2', slug: 'marcus-williams', name: 'Marcus Williams', avatar: { url: '/images/author-2.jpg', width: 100, height: 100, alt: 'Marcus Williams' }, bio: 'Technology editor covering AI and startups.', role: 'Tech Editor' },
   { id: 'a3', slug: 'elena-rodriguez', name: 'Elena Rodriguez', avatar: { url: '/images/author-3.jpg', width: 100, height: 100, alt: 'Elena Rodriguez' }, bio: 'Global affairs correspondent.', role: 'World News Editor' },
+  { id: 'hamza-ahmed', slug: 'hamza-ahmed', name: 'Hamza Ahmed', avatar: { url: '/media/hamza-ahmed.jpg', width: 1024, height: 1024, alt: 'Hamza Ahmed' }, bio: 'Founder and Editor-in-Chief of The Observer US.', role: 'Founder & Editor-in-Chief', linkedin: 'https://www.linkedin.com/in/hamza-ahmed', twitter: 'https://x.com/hamzaahmed', website: 'https://theobserverus.com' },
 ]
 
 const MOCK_HEADLINES = [
@@ -244,4 +301,8 @@ function getMockArticles(options?: {
 function getMockArticleBySlug(category: string, slug: string): Article | null {
   const result = getMockArticles({ category, limit: 50 })
   return result.data.find((a) => a.slug === slug) ?? null
+}
+
+function getMockAuthorBySlug(slug: string): Author | null {
+  return MOCK_AUTHORS.find((a) => a.slug === slug) ?? null
 }

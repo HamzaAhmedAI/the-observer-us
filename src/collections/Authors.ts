@@ -45,5 +45,20 @@ export const Authors: CollectionConfig = {
       type: 'text',
       label: 'Role',
     },
+    {
+      name: 'linkedin',
+      type: 'text',
+      label: 'LinkedIn URL',
+    },
+    {
+      name: 'twitter',
+      type: 'text',
+      label: 'X / Twitter URL',
+    },
+    {
+      name: 'website',
+      type: 'text',
+      label: 'Website URL',
+    },
   ],
 }
