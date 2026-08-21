@@ -129,15 +129,19 @@ export function Footer() {
               Legal
             </h3>
             <ul className="space-y-2.5">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
-                <li key={item}>
+              {[
+                { label: 'Privacy Policy', href: '/privacy' },
+                { label: 'Terms of Service', href: '/terms' },
+                { label: 'Cookie Policy', href: '/cookies' },
+              ].map((item) => (
+                <li key={item.href}>
                   <Link
-                    href={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                    href={item.href}
                     className="text-sm text-[var(--color-text-secondary)] no-underline
                                transition-colors duration-[var(--duration-fast)]
                                hover:text-[var(--color-text-primary)]"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
