@@ -7,13 +7,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ReadingTime } from './ReadingTime'
+import { RelativeTime } from './RelativeTime'
+import { LiveBadge } from './LiveBadge'
+import { isLive } from '@/lib/relative-time'
 import type { ArticleCardProps } from '@/types/article'
-
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-})
 
 export function ArticleCard({
   article,
@@ -112,14 +109,18 @@ export function ArticleCard({
         </div>
 
         {/* Meta — separated visually for card variants */}
-        <div className={`flex items-center gap-3 text-xs text-[var(--color-text-tertiary)] ${
+        <div className={`flex flex-wrap items-center gap-3 text-xs text-[var(--color-text-tertiary)] ${
           !isHero && !isCompact ? 'border-t border-[var(--color-border-light)] px-4 py-3' : isCompact ? 'px-0' : ''
         }`}>
-          <span>{article.author.name}</span>
+          <span className="truncate max-w-[120px]" title={article.author.name}>{article.author.name}</span>
           <span aria-hidden="true" className="text-[var(--color-border-heavy)]">&middot;</span>
-          <time dateTime={article.publishedAt}>
-            {dateFormatter.format(new Date(article.publishedAt))}
-          </time>
+          <RelativeTime date={article.publishedAt} />
+          {isLive(article.publishedAt) && (
+            <>
+              <span aria-hidden="true" className="text-[var(--color-border-heavy)]">&middot;</span>
+              <LiveBadge />
+            </>
+          )}
           <span aria-hidden="true" className="text-[var(--color-border-heavy)]">&middot;</span>
           <ReadingTime minutes={article.readTime} />
         </div>

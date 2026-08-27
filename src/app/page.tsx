@@ -39,10 +39,12 @@ export default async function HomePage() {
     console.error('Failed to load homepage data:', error)
   }
 
-  // Fetch articles for first 4 categories in parallel
-  const categorySections = await Promise.all(
-    categories.slice(0, 4).map((cat) => getCategoryArticles(cat))
-  )
+  // Fetch articles for first 4 categories in parallel, then drop empty sections.
+  // Empty category blocks look broken on the homepage, so only render
+  // sections that actually have at least one article.
+  const categorySections = (
+    await Promise.all(categories.slice(0, 4).map((cat) => getCategoryArticles(cat)))
+  ).filter(({ articles }) => articles.length > 0)
 
   return (
     <div className="container-news py-8 md:py-12">

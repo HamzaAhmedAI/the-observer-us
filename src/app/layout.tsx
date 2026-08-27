@@ -8,6 +8,8 @@ import { DEFAULT_METADATA } from '@/lib/seo'
 import { Header } from '@/components/ui/Header'
 import { Footer } from '@/components/ui/Footer'
 import { WebVitals } from '@/components/analytics/WebVitals'
+import { BreakingBanner } from '@/components/reader/BreakingBanner'
+import { NewsletterPopup } from '@/components/reader/NewsletterPopup'
 import './globals.css'
 
 export const metadata: Metadata = DEFAULT_METADATA
@@ -51,11 +53,13 @@ export default function RootLayout({
       <body className="min-h-[100dvh] bg-[var(--color-surface)] text-[var(--color-text-primary)] antialiased">
         <FontProvider>
           <div className="flex min-h-[100dvh] flex-col">
+            <BreakingBanner />
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
           <WebVitals />
+          <NewsletterPopup />
         </FontProvider>
       </body>
     </html>

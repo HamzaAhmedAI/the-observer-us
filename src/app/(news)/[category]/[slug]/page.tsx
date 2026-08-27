@@ -6,13 +6,19 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticleBySlug } from '@/lib/cms'
+import { getArticleBySlug, getRelatedArticles } from '@/lib/cms'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
 import { JsonLd } from '@/components/analytics/JsonLd'
 import { BookmarkButton } from '@/components/reader/BookmarkButton'
 import { ShareTools } from '@/components/reader/ShareTools'
+import { LiveBadge } from '@/components/reader/LiveBadge'
+import { RelatedArticles } from '@/components/reader/RelatedArticles'
+import { MostRead } from '@/components/reader/MostRead'
+import { RelativeTime } from '@/components/reader/RelativeTime'
+import { ViewBeacon } from '@/components/analytics/ViewBeacon'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
 import { isArchived } from '@/lib/revalidate'
+import { isLive } from '@/lib/relative-time'
 import type { Metadata } from 'next'
 
 export const revalidate = 3600
@@ -79,6 +85,9 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <>
+      {/* Fire one page-view per article render */}
+      <ViewBeacon category={article.category.slug} slug={article.slug} />
+
       {/* JSON-LD Structured Data */}
       <JsonLd
         title={article.title}
@@ -167,9 +176,8 @@ export default async function ArticlePage({ params }: Props) {
               <span aria-hidden="true">&middot;</span>
               <span className="flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M208,32H192V24a8,8,0,0,0-16,0v8H80V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM48,48H64v8a8,8,0,0,0,16,0V48h96v8a8,8,0,0,0,16,0V48h16V80H48V208ZM208,208H48V96H208V208Z"/></svg>
-                <time dateTime={article.publishedAt}>
-                  {dateFormatter.format(new Date(article.publishedAt))}
-                </time>
+                <RelativeTime date={article.publishedAt} />
+                {isLive(article.publishedAt) && <LiveBadge />}
               </span>
               <span aria-hidden="true">&middot;</span>
               <span className="flex items-center gap-1.5">
@@ -253,12 +261,16 @@ export default async function ArticlePage({ params }: Props) {
 
         {/* Sidebar */}
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
+          <div className="sticky top-24 space-y-8">
             <CategorySidebar currentCategory={article.category.slug} />
+            <MostRead category={article.category.slug} excludeId={article.id} />
           </div>
         </aside>
       </div>
       </article>
+
+      {/* Related articles (full width, below main + sidebar grid) */}
+      <RelatedArticles category={article.category.slug} excludeId={article.id} />
     </>
   )
 }

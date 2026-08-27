@@ -136,6 +136,84 @@ export async function getArticleBySlug(
   }
 }
 
+export async function getRelatedArticles(options: {
+  category: string
+  excludeId: string
+  limit?: number
+}): Promise<Article[]> {
+  if (USE_MOCK) {
+    const res = await getMockArticles({ category: options.category, limit: options.limit ?? 4 })
+    return res.data.filter((a) => a.id !== options.excludeId)
+  }
+  try {
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'articles',
+      where: {
+        'category.slug': { equals: options.category },
+        id: { not_equals: options.excludeId },
+        _status: { equals: 'published' },
+      } as import('payload').Where,
+      depth: 2,
+      sort: '-publishedAt',
+      limit: options.limit ?? 4,
+    })
+    return (result.docs as Article[]).map(normalizeTags)
+  } catch {
+    return []
+  }
+}
+
+export async function getMostRead(options?: {
+  category?: string
+  excludeId?: string
+  limit?: number
+}): Promise<Article[]> {
+  if (USE_MOCK) {
+    const all = await getMockArticles({ limit: options?.limit ?? 5 })
+    return all.data.filter((a) => a.id !== options?.excludeId)
+  }
+  try {
+    const payload = await getP()
+    const where: Record<string, unknown> = { _status: { equals: 'published' } }
+    if (options?.category) where['category.slug'] = { equals: options.category }
+    if (options?.excludeId) where['id'] = { not_equals: options.excludeId }
+    const result = await payload.find({
+      collection: 'articles',
+      where: where as import('payload').Where,
+      depth: 2,
+      sort: '-viewCount',
+      limit: options?.limit ?? 5,
+    })
+    return (result.docs as Article[]).map(normalizeTags)
+  } catch {
+    return []
+  }
+}
+
+export async function getBreakingArticles(limit = 1): Promise<Article[]> {
+  if (USE_MOCK) {
+    const res = await getMockArticles({ limit })
+    return res.data.filter((a) => a.isBreaking)
+  }
+  try {
+    const payload = await getP()
+    const result = await payload.find({
+      collection: 'articles',
+      where: {
+        isBreaking: { equals: true },
+        _status: { equals: 'published' },
+      } as import('payload').Where,
+      depth: 2,
+      sort: '-publishedAt',
+      limit,
+    })
+    return (result.docs as Article[]).map(normalizeTags)
+  } catch {
+    return []
+  }
+}
+
 export async function getCategories(): Promise<Category[]> {
   if (USE_MOCK) {
     return getMockCategories()

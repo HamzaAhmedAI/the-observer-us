@@ -17,6 +17,7 @@ export interface Article {
   isBreaking: boolean
   isFeatured: boolean
   readTime: number // in minutes
+  viewCount?: number
   seo: SEO
 }
 
