@@ -1,17 +1,23 @@
 /* ============================================================
    The Observer US — Dynamic News Sitemap (Google News)
-   Serves articles published within the last 48 hours.
+   Serves the most recent published articles (no time filter)
+   so Google News can index the full catalog. Cap at 1000
+   URLs (Google News spec). Switch to a 48h window once the
+   site is publishing 50+ articles/day.
    ============================================================ */
 
 import { getArticles } from '@/lib/cms'
 import { SITE_URL } from '@/lib/seo'
 
 export async function GET() {
-  const articles = await getArticles({ limit: 50 })
-  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000)
+  // Pull the last 1000 published articles (no time filter). Google News
+  // accepts up to 1000 URLs in a news sitemap, and a brand-new site
+  // benefits from showing its full catalog so the crawler can index
+  // the site holistically. Switch to a 48h window once you're
+  // publishing 50+ articles/day.
+  const articles = await getArticles({ limit: 1000 })
 
   const newsUrls = articles.data
-    .filter((article) => new Date(article.publishedAt) > fortyEightHoursAgo)
     .map(
       (article) => `
     <url>
@@ -19,7 +25,7 @@ export async function GET() {
       <news:news>
         <news:publication>
           <news:name>The Observer US</news:name>
-          <news:language>en</news:language>
+          <news:language>en-us</news:language>
         </news:publication>
         <news:publication_date>${article.publishedAt}</news:publication_date>
         <news:title>${escapeXml(article.title)}</news:title>

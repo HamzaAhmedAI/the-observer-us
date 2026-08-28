@@ -38,6 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: article.seo.title,
     description: article.seo.description,
+    alternates: {
+      canonical: `${SITE_URL}/${article.category.slug}/${article.slug}`,
+    },
     openGraph: {
       title: article.seo.title,
       description: article.seo.description,
@@ -101,6 +104,11 @@ export default async function ArticlePage({ params }: Props) {
         authorName={article.author.name}
         authorUrl={`${SITE_URL}/authors/${article.author.slug}`}
         publisherName={SITE_NAME}
+        breadcrumbs={[
+          { name: 'Home', url: SITE_URL },
+          { name: article.category.name, url: `${SITE_URL}/${article.category.slug}` },
+          { name: article.title, url: `${SITE_URL}/${article.category.slug}/${article.slug}` },
+        ]}
       />
 
       <article className="container-news py-8 md:py-12">

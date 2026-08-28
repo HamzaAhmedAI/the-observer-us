@@ -4,12 +4,13 @@
 
 import type { Metadata, Viewport } from 'next'
 import { FontProvider } from '@/lib/fonts'
-import { DEFAULT_METADATA } from '@/lib/seo'
+import { DEFAULT_METADATA, SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/seo'
 import { Header } from '@/components/ui/Header'
 import { Footer } from '@/components/ui/Footer'
 import { WebVitals } from '@/components/analytics/WebVitals'
 import { BreakingBanner } from '@/components/reader/BreakingBanner'
 import { NewsletterPopup } from '@/components/reader/NewsletterPopup'
+import { SiteJsonLd } from '@/components/analytics/JsonLd'
 import './globals.css'
 
 export const metadata: Metadata = DEFAULT_METADATA
@@ -26,8 +27,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-US" suppressHydrationWarning>
       <head>
+        <SiteJsonLd
+          siteUrl={SITE_URL}
+          siteName={SITE_NAME}
+          siteDescription={SITE_DESCRIPTION}
+        />
+
         {/* Preconnect to external origins for performance */}
         <link rel="preconnect" href="https://picsum.photos" />
         <link rel="dns-prefetch" href="https://picsum.photos" />
