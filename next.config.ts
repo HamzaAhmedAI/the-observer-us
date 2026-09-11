@@ -3,16 +3,16 @@ import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = withPayload({
   images: {
-    // Allow picsum.photos for development mock data
+    // Payload serves media via /api/media/file/... which Next's image
+    // optimizer refuses to process (same-origin /api route). Disable
+    // on-the-fly optimization so next/image emits the raw URL directly.
+    unoptimized: true,
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
-      {
-        protocol: "https",
-        hostname: "**.vercel.app",
-      },
+      // Local media served by Payload's staticDir on this VM.
+      { protocol: "https", hostname: "**.theobserverus.com" },
+      { protocol: "http", hostname: "**.theobserverus.com" },
+      // Allow picsum.photos for development mock data
+      { protocol: "https", hostname: "picsum.photos" },
       // Add your CMS image hostname here for production:
       // { protocol: "https", hostname: "cdn.example.com" },
     ],

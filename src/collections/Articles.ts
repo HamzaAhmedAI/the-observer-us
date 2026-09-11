@@ -145,6 +145,17 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+      name: 'viewCount',
+      type: 'number',
+      label: 'View Count',
+      defaultValue: 0,
+      admin: {
+        position: 'sidebar',
+        description: 'Total page views. Auto-incremented by /api/track.',
+        readOnly: false,
+      },
+    },
+    {
       name: 'readTime',
       type: 'number',
       label: 'Read Time (minutes)',

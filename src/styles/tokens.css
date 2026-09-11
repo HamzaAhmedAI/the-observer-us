@@ -12,6 +12,8 @@
   --color-brand-light: #fef1ee;
   --color-brand-dark: #7f1d1d;
   --color-brand-subtle: rgba(220, 38, 38, 0.06);
+  /* Darker red for brand-colored TEXT on light surfaces (meets WCAG AA 4.5:1). */
+  --color-brand-text: #b81d1d;
 
   /* ========================================
      Surface Colors — Warm Paper
@@ -30,8 +32,8 @@
      and feels intentional.
      ======================================== */
   --color-text-primary: #1a1614;
-  --color-text-secondary: #6b6359;
-  --color-text-tertiary: #7e756a;
+  --color-text-secondary: #5c554c;
+  --color-text-tertiary: #635a50;
   --color-text-on-brand: #ffffff;
   --color-text-link: #dc2626;
 
@@ -139,6 +141,7 @@
   --color-brand-light: #2d0a08;
   --color-brand-dark: #fecaca;
   --color-brand-subtle: rgba(239, 68, 68, 0.08);
+  --color-brand-text: #e11d1d;
 
   --color-surface: #1a1816;
   --color-surface-alt: #24211d;
@@ -146,8 +149,8 @@
   --color-surface-hover: #322e29;
 
   --color-text-primary: #ece7e1;
-  --color-text-secondary: #a0988e;
-  --color-text-tertiary: #948c82;
+  --color-text-secondary: #b3aaa0;
+  --color-text-tertiary: #aaa198;
   --color-text-on-brand: #ffffff;
   --color-text-link: #ef4444;
 

@@ -1,0 +1,14 @@
+# Cloudflare Tunnel config — free, no open ports, no firewall changes.
+# Run ONCE before enabling the service:
+#   cloudflared tunnel login
+#   cloudflared tunnel create observer
+#   cloudflared tunnel route dns observer theobserverus.com
+tunnel: observer
+credentials-file: /home/opc/.cloudflared/observer.json
+
+ingress:
+  - hostname: theobserverus.com
+    service: http://localhost:3001
+  - hostname: www.theobserverus.com
+    service: http://localhost:3001
+  - service: http_status:404

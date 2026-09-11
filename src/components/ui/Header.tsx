@@ -75,7 +75,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border-light)] bg-[var(--color-surface)]/85 backdrop-blur-lg">
       {/* Hidden checkbox — visually hidden but NOT display:none so label clicks still toggle it */}
-      <input type="checkbox" id={MENU_ID} className="absolute -inset-full opacity-0 pointer-events-none" autoComplete="off" />
+      <input type="checkbox" id={MENU_ID} className="absolute -inset-full opacity-0 pointer-events-none" autoComplete="off" aria-label="Toggle mobile menu" />
 
       <div className="container-news flex h-14 items-center justify-between gap-4 md:h-16">
         {/* Logo */}
@@ -83,7 +83,7 @@ export function Header() {
           href="/"
           className="flex items-center gap-2 text-lg font-bold tracking-tight text-[var(--color-text-primary)] no-underline hover:opacity-80 transition-opacity duration-[var(--duration-fast)]"
         >
-          <span className="text-[var(--color-brand)]">The</span>
+          <span className="text-[var(--color-brand-text)]">The</span>
           <span>Observer</span>
           <span className="inline text-xs font-medium text-[var(--color-text-tertiary)]">US</span>
         </Link>

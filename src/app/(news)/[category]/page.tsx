@@ -2,6 +2,7 @@
    The Observer US — Category Feed Page
    ============================================================ */
 
+import { notFound } from 'next/navigation'
 import { ArticleCard } from '@/components/reader/ArticleCard'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
 import { Pagination } from '@/components/reader/Pagination'
@@ -38,6 +39,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   ])
 
   const cat = categories.find((c) => c.slug === category)
+
+  // (C1) Unknown category → 404. Without this, /anything-here renders an
+  // empty page with HTTP 200, which Google indexes as a real page.
+  if (!cat) {
+    notFound()
+  }
 
   return (
     <div className="container-news py-8 md:py-12">

@@ -1,5 +1,9 @@
 /* ============================================================
-   Media — Image uploads (Vercel Blob storage)
+   Media — Image uploads (local disk, self-hosted free)
+
+   Uses Payload's built-in local upload (staticDir) so media is
+   served from the app filesystem at /media/<file> on the Oracle VM.
+   No Vercel Blob / external storage dependency.
    ============================================================ */
 
 import type { CollectionConfig } from 'payload'
@@ -15,7 +19,10 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   upload: {
-    staticDir: 'media',
+    // Serve media as static files from public/media so Next.js image
+    // optimization can process them (the default /api/media/file path is
+    // rejected by Next's optimizer as a same-origin /api route).
+    staticDir: 'public/media',
     imageSizes: [
       {
         name: 'card',

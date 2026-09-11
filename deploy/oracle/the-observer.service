@@ -1,0 +1,21 @@
+[Unit]
+Description=The Observer US (Next.js + Payload)
+After=network.target
+
+[Service]
+Type=simple
+User=opc
+WorkingDirectory=/opt/observer/the-observer-us
+# Production env lives next to the app; never commit secrets.
+EnvironmentFile=/opt/observer/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -p 3001
+Restart=on-failure
+RestartSec=5
+# Keep memory bounded on the 12 GB free VM
+MemoryMax=2G
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
