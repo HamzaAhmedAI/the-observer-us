@@ -27,16 +27,12 @@ export default function PreferencesPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [pageState, setPageState] = useState<PageState>('email-input')
   const [errorMsg, setErrorMsg] = useState('')
-  const [pushStatus, setPushStatus] = useState<'unsupported' | 'default' | 'granted' | 'denied'>('default')
+  const [pushStatus, setPushStatus] = useState<'unsupported' | 'default' | 'granted' | 'denied'>(() => {
+    if (typeof Notification === 'undefined') return 'unsupported'
+    return Notification.permission as 'default' | 'granted' | 'denied'
+  })
 
-  // Check push permission on mount
-  useEffect(() => {
-    if (typeof Notification === 'undefined') {
-      setPushStatus('unsupported')
-    } else {
-      setPushStatus(Notification.permission as 'default' | 'granted' | 'denied')
-    }
-  }, [])
+  // Check push permission on mount - using lazy initializer avoids setState in effect
 
   const toggleCategory = useCallback((slug: string) => {
     setSelectedCategories((prev) =>

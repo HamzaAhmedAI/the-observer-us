@@ -6,6 +6,7 @@
    ============================================================ */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { LegalPage, LegalSection, LegalList } from '@/components/reader/LegalPage'
 import { SITE_NAME } from '@/lib/seo'
 
@@ -176,9 +177,9 @@ export default function PrivacyPage() {
           <li>
             <strong className="text-[var(--color-text-primary)]">Unsubscribe from email</strong> — use
             the link in any email, or visit{' '}
-            <a href="/unsubscribe" className="text-[var(--color-accent)] hover:underline">
+            <Link href="/unsubscribe" className="text-[var(--color-accent)] hover:underline">
               /unsubscribe
-            </a>
+            </Link>
             .
           </li>
           <li>

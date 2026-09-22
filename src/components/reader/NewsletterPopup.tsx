@@ -101,7 +101,7 @@ export function NewsletterPopup() {
               <Envelope size={20} className="text-[var(--color-brand)]" />
             </div>
             <h2 id="newsletter-popup-heading" className="mb-2 text-xl font-bold">
-              You're in.
+              You&apos;re in.
             </h2>
             <p className="text-sm text-[var(--color-text-secondary)]">
               Check your inbox to confirm. Thanks for subscribing.
@@ -113,7 +113,7 @@ export function NewsletterPopup() {
               <Envelope size={20} className="text-[var(--color-brand)]" />
             </div>
             <h2 id="newsletter-popup-heading" className="mb-2 text-center text-2xl font-bold">
-              Don't miss the next story.
+              Don&apos;t miss the next story.
             </h2>
             <p className="mb-6 text-center text-sm text-[var(--color-text-secondary)]">
               Free daily briefing — top stories, in your inbox every morning.

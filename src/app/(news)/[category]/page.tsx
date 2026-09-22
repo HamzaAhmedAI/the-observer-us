@@ -13,12 +13,19 @@ import type { Metadata } from 'next'
 export const revalidate = 600
 
 interface Props {
-  params: Promise<{ category: string }>
+  params: { category: string }
   searchParams: Promise<{ page?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category } = await params
+  const { category } = params
+
+  // ─── Defense-in-depth URL parameter validation ────────────────────
+  const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/
+  if (!VALID_CATEGORY.test(category) || category.includes('..') || category.includes('<') || category.includes('>')) {
+    return { title: 'Category Not Found', robots: 'noindex, nofollow' }
+  }
+
   const categories = await getCategories()
   const cat = categories.find((c) => c.slug === category)
 
@@ -29,9 +36,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  const { category } = await params
+  const { category } = params
   const { page: pageStr } = await searchParams
   const page = Number(pageStr) || 1
+
+  // ─── Defense-in-depth URL parameter validation ────────────────────
+  const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/
+  if (!VALID_CATEGORY.test(category) || category.includes('..') || category.includes('<') || category.includes('>')) {
+    notFound()
+  }
 
   const [articles, categories] = await Promise.all([
     getArticles({ category, limit: 12, page }),

@@ -7,7 +7,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 interface BreakingBannerClientProps {
   href: string
@@ -16,18 +16,23 @@ interface BreakingBannerClientProps {
 
 const DISMISS_KEY = 'breaking-dismissed'
 
+function getDismissedSnapshot(): boolean {
+  if (typeof window === 'undefined') return false
+  return sessionStorage.getItem(DISMISS_KEY) === '1'
+}
+
+function subscribeToDismissal(): () => void {
+  return () => {}
+}
+
 export function BreakingBannerClient({ href, label }: BreakingBannerClientProps) {
-  const [dismissed, setDismissed] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const dismissed = useSyncExternalStore(
+    subscribeToDismissal,
+    getDismissedSnapshot,
+    () => false,
+  )
 
-  useEffect(() => {
-    setMounted(true)
-    try {
-      if (sessionStorage.getItem(DISMISS_KEY) === '1') setDismissed(true)
-    } catch {}
-  }, [])
-
-  if (!mounted || dismissed) return null
+  if (dismissed) return null
 
   return (
     <div
@@ -55,7 +60,6 @@ export function BreakingBannerClient({ href, label }: BreakingBannerClientProps)
         <button
           type="button"
           onClick={() => {
-            setDismissed(true)
             try { sessionStorage.setItem(DISMISS_KEY, '1') } catch {}
           }}
           className="rounded p-1 transition-opacity hover:opacity-80"

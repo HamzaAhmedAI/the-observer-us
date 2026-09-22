@@ -12,19 +12,20 @@ interface BookmarkButtonProps {
 const STORAGE_KEY = 'Observer-bookmarks'
 
 export function BookmarkButton({ slug, title, className = '' }: BookmarkButtonProps) {
-  const [isBookmarked, setIsBookmarked] = useState(false)
-
-  useEffect(() => {
+  const [isBookmarked, setIsBookmarked] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const bookmarks = JSON.parse(stored) as Record<string, string>
-        setIsBookmarked(!!bookmarks[slug])
+        return !!bookmarks[slug]
       }
     } catch {
       // localStorage unavailable or corrupt — treat as not bookmarked
     }
-  }, [slug])
+    return false
+  })
+
+  // Initial bookmark state loaded via lazy initializer to avoid setState in effect
 
   const toggleBookmark = useCallback(() => {
     try {

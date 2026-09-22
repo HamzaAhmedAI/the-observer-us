@@ -45,13 +45,17 @@ export default function ArticleLoading() {
 
           {/* Article Body Skeleton */}
           <div className="space-y-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-4 animate-pulse rounded bg-[var(--color-surface-alt)]"
-                style={{ width: `${65 + Math.random() * 35}%` }}
-              />
-            ))}
+            {Array.from({ length: 8 }).map((_, i) => {
+              // Deterministic pseudo-random width for stable skeleton rendering
+              const width = 65 + ((i * 7 + 3) % 35)
+              return (
+                <div
+                  key={i}
+                  className="h-4 animate-pulse rounded bg-[var(--color-surface-alt)]"
+                  style={{ width: `${width}%` }}
+                />
+              )
+            })}
           </div>
 
           {/* Author Bio Skeleton */}

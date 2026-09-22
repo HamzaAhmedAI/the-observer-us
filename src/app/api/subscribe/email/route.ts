@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Please provide a valid email address.' },
@@ -36,10 +36,52 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validate categories (optional)
+    // Additional security: reject common XSS patterns in email
+    const xssPatterns = [
+      /<script\b/gi,
+      /javascript:/gi,
+      /onerror\s*=\s*['\"]?/gi,
+      /onload\s*=\s*['\"]?/gi,
+      /alert\s*\(/gi,
+    ]
+
+    for (const pattern of xssPatterns) {
+      if (pattern.test(email)) {
+        return NextResponse.json(
+          { error: 'Invalid email format.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate categories (whitelist approach - only known categories)
+    const KNOWN_CATEGORIES = ['politics', 'technology', 'business', 'sports', 'entertainment', 'health', 'science', 'world'] as const
+    type KnownCategory = typeof KNOWN_CATEGORIES[number]
+
     const validCategories = Array.isArray(categories)
-      ? categories.filter((c): c is string => typeof c === 'string')
+      ? categories
+          .filter((c): c is string => typeof c === 'string')
+          .map((s) => s.toLowerCase().trim())
+          .filter((s): s is KnownCategory => KNOWN_CATEGORIES.includes(s as KnownCategory))
       : []
+
+    // Sanitize categories: reject path traversal, injection attempts
+    for (const cat of validCategories) {
+      if (cat.includes('../') || cat.includes('/../') || cat.includes('..\\')) {
+        return NextResponse.json(
+          { error: 'Invalid category format.' },
+          { status: 400 }
+        )
+      }
+
+      // Reject SQL injection-like patterns
+      if (cat.includes(' OR ') || cat.includes('SELECT ') || cat.includes('INSERT ')) {
+        return NextResponse.json(
+          { error: 'Invalid category format.' },
+          { status: 400 }
+        )
+      }
+    }
 
     // Store subscriber in database
     const { error } = await createSubscriber(email, validCategories)
