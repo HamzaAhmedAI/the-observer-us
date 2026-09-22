@@ -187,7 +187,7 @@ export default async function OpenGraphImage({ params }: Props) {
               letterSpacing: '0.1em',
             }}
           >
-            theobserveer.com
+            theobserverus.com
           </span>
         </div>
       </div>

@@ -6,7 +6,7 @@
 const CACHE_NAME = 'observeer-v1'
 
 // ─── Install: pre-cache critical assets ─────────────────────
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 

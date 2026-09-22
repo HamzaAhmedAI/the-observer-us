@@ -3,12 +3,13 @@
    Premium sticky nav with refined transparency, subtle
    bottom border treatment, and a clean mobile menu.
    Uses a CSS checkbox hack for reliable mobile toggling.
+   Uses useSyncExternalStore for React-18-compliant external state.
    ============================================================ */
 
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useSyncExternalStore, useCallback, useState } from 'react'
 import { List, X, Moon, Sun } from '@phosphor-icons/react'
 
 const NAV_LINKS = [
@@ -24,22 +25,38 @@ const NAV_LINKS = [
 
 /* Shared ID for the mobile-menu checkbox — unique enough since Header is a singleton */
 const MENU_ID = 'obv-menu-toggle'
+const THEME_CHANGE_EVENT = 'observer-theme-change'
+
+function getThemeSnapshot(): boolean {
+  if (typeof window === 'undefined') return false
+  const stored = localStorage.getItem('theme')
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  return stored === 'dark' || (!stored && prefersDark)
+}
+
+function subscribeToThemeChange(): () => void {
+  if (typeof window === 'undefined') return () => {}
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  const handleChange = () => window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
+  mediaQuery.addEventListener('change', handleChange)
+  window.addEventListener('storage', handleChange)
+  return () => {
+    mediaQuery.removeEventListener('change', handleChange)
+    window.removeEventListener('storage', handleChange)
+  }
+}
 
 export function Header() {
-  const [mounted, setMounted] = useState(false)
-  const [isDark, setIsDark] = useState(false)
+  const isDark = useSyncExternalStore(
+    subscribeToThemeChange,
+    getThemeSnapshot,
+    () => false,
+  )
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    try {
-      const stored = localStorage.getItem('theme')
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const dark = stored === 'dark' || (!stored && prefersDark)
-      setIsDark(dark)
-      document.documentElement.classList.toggle('dark', dark)
-    } catch {}
-  }, [])
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
 
   /* Sync React state with checkbox for icon swap */
   useEffect(() => {
@@ -67,9 +84,9 @@ export function Header() {
 
   const toggleDark = useCallback(() => {
     const next = !isDark
-    setIsDark(next)
     document.documentElement.classList.toggle('dark', next)
     localStorage.setItem('theme', next ? 'dark' : 'light')
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
   }, [isDark])
 
   return (
@@ -104,15 +121,13 @@ export function Header() {
         {/* Right Actions */}
         <div className="flex items-center gap-1">
           {/* Dark Mode Toggle */}
-          {mounted && (
-            <button
-              onClick={toggleDark}
-              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] transition-all duration-[var(--duration-fast)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]"
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDark ? <Sun size={16} weight="bold" /> : <Moon size={16} weight="bold" />}
-            </button>
-          )}
+          <button
+            onClick={toggleDark}
+            className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-tertiary)] transition-all duration-[var(--duration-fast)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)]"
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <Sun size={16} weight="bold" /> : <Moon size={16} weight="bold" />}
+          </button>
 
           {/* Mobile Menu Hamburger — label toggles the checkbox.
               aria-label is prohibited on <label>; use visually hidden text instead. */}

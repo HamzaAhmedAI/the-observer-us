@@ -6,7 +6,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticleBySlug, getRelatedArticles } from '@/lib/cms'
+import { getArticleBySlug, getRelatedArticles, getArticles } from '@/lib/cms'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
 import { JsonLd } from '@/components/analytics/JsonLd'
 import { BookmarkButton } from '@/components/reader/BookmarkButton'
@@ -23,12 +23,41 @@ import type { Metadata } from 'next'
 
 export const revalidate = 3600
 
+export async function generateStaticParams() {
+  const articles = await getArticles({ limit: 1000 }) // Fetch all published articles
+  return articles.data.map(article => ({
+    category: article.category.slug,
+    slug: article.slug,
+  }))
+}
+
 interface Props {
-  params: Promise<{ category: string; slug: string }>
+  params: { category: string; slug: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category, slug } = await params
+  const { category, slug } = params
+
+  // ─── Defense-in-depth URL parameter validation ────────────────────────────
+  // Same validation as in ArticlePage - keeps metadata generation safe
+  const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/
+  const VALID_SLUG = /^[a-z0-9][a-z0-9-]*$/
+
+  if (
+    !VALID_CATEGORY.test(category) ||
+    !VALID_SLUG.test(slug) ||
+    slug.includes('..') ||
+    slug.includes('<') ||
+    slug.includes('>') ||
+    slug.includes('"') ||
+    slug.includes("'") ||
+    slug.includes('javascript:') ||
+    slug.includes('onerror') ||
+    slug.includes('onload')
+  ) {
+    return { title: 'Article Not Found', robots: 'noindex, nofollow' }
+  }
+
   const article = await getArticleBySlug(category, slug)
 
   if (!article) {
@@ -79,7 +108,35 @@ const dateFormatter = new Intl.DateTimeFormat('en-US', {
 })
 
 export default async function ArticlePage({ params }: Props) {
-  const { category, slug } = await params
+  const { category, slug } = params
+
+  // ─── Defense-in-depth URL parameter validation ────────────────────────────
+  // Validate that URL parameters conform to safe patterns before use.
+  // This prevents XSS via malformed URLs like /technology/<script>alert(1)</script>
+  // even if other layers miss it.
+  const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/ // lowercase letters/digits/hyphens
+  const VALID_SLUG = /^[a-z0-9][a-z0-9-]*$/ // lowercase letters/digits/hyphens
+  const SAFE_CATEGORIES = new Set(['politics','technology','business','sports',
+    'entertainment','health','science','world'])
+
+  if (
+    !VALID_CATEGORY.test(category) ||
+    !VALID_SLUG.test(slug) ||
+    slug.includes('..') ||
+    slug.includes('<') ||
+    slug.includes('>') ||
+    slug.includes('"') ||
+    slug.includes("'") ||
+    slug.includes('javascript:') ||
+    slug.includes('onerror') ||
+    slug.includes('onload') ||
+    category.includes('..') ||
+    category.includes('<') ||
+    category.includes('>')
+  ) {
+    notFound()
+  }
+
   const article = await getArticleBySlug(category, slug)
 
   if (!article) {
@@ -102,7 +159,7 @@ export default async function ArticlePage({ params }: Props) {
         datePublished={article.publishedAt}
         dateModified={article.updatedAt}
         authorName={article.author.name}
-        authorUrl={`${SITE_URL}/authors/${article.author.slug}`}
+        authorUrl={article.author.slug ? `${SITE_URL}/author/${article.author.slug}` : SITE_URL}
         publisherName={SITE_NAME}
         breadcrumbs={[
           { name: 'Home', url: SITE_URL },

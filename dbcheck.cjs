@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { Client } = require('pg');
 const url = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 if(!url){console.error('NO DB URL');process.exit(2);}

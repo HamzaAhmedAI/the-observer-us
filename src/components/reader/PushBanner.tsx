@@ -1,101 +1,99 @@
 /* ============================================================
    The Observer US — Push Notification Opt-in Banner
    Client island: service worker registration + VAPID subscribe.
+   Uses useSyncExternalStore for React-18-compliant external state.
    ============================================================ */
 
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useState, useSyncExternalStore } from 'react'
 import { Bell, X, BellSlash } from '@phosphor-icons/react'
 
 type PermissionState = 'idle' | 'loading' | 'granted' | 'denied' | 'error' | 'dismissed'
 
+const DISMISS_KEY = 'push-banner-dismissed'
+const PERMISSION_CHANGE_EVENT = 'observer-permission-change'
+
+function getPermissionSnapshot(): PermissionState {
+  if (typeof window === 'undefined') return 'idle'
+  if (localStorage.getItem(DISMISS_KEY) === 'true') return 'dismissed'
+  if (!('Notification' in window)) return 'dismissed'
+  if (Notification.permission === 'granted') return 'granted'
+  if (Notification.permission === 'denied') return 'denied'
+  return 'idle'
+}
+
+function subscribeToPermissionChange(): () => void {
+  if (typeof window === 'undefined') return () => {}
+  const handleChange = () => window.dispatchEvent(new Event(PERMISSION_CHANGE_EVENT))
+  window.addEventListener(PERMISSION_CHANGE_EVENT, handleChange)
+  return () => window.removeEventListener(PERMISSION_CHANGE_EVENT, handleChange)
+}
+
 export function PushBanner() {
-  const [permission, setPermission] = useState<PermissionState>('idle')
+  const permission = useSyncExternalStore(
+    subscribeToPermissionChange,
+    getPermissionSnapshot,
+    () => 'idle',
+  )
   const [errorMsg, setErrorMsg] = useState('')
 
-  // On mount, check if already dismissed or already granted
-  useEffect(() => {
-    const dismissed = localStorage.getItem('push-banner-dismissed')
-    if (dismissed === 'true') {
-      setPermission('dismissed')
+  const handleSubscribe = useCallback(async () => {
+    // Force re-read by dispatching event after async operations
+    const notifyChange = () => window.dispatchEvent(new Event(PERMISSION_CHANGE_EVENT))
+
+    // 1. Request notification permission
+    const permResult = await Notification.requestPermission()
+    if (permResult !== 'granted') {
+      notifyChange()
       return
     }
 
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        setPermission('granted')
-      } else if (Notification.permission === 'denied') {
-        setPermission('denied')
-      }
+    // 2. Register service worker
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+    })
+    await navigator.serviceWorker.ready
+
+    // 3. Subscribe to push
+    const vapidPublicKey =
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ??
+      ''
+
+    if (!vapidPublicKey) {
+      console.warn('[PushBanner] VAPID public key not configured — skipping push subscription')
+      notifyChange()
+      return
     }
-  }, [])
 
-  const handleSubscribe = useCallback(async () => {
-    setPermission('loading')
-    setErrorMsg('')
+    const pushSubscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
+    })
 
-    try {
-      // 1. Request notification permission
-      const permResult = await Notification.requestPermission()
-      if (permResult !== 'granted') {
-        setPermission('denied')
-        return
-      }
+    // 4. Send subscription to our API
+    const subData = pushSubscription.toJSON()
+    const response = await fetch('/api/subscribe/push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subscription: {
+          endpoint: subData.endpoint,
+          keys: subData.keys,
+        },
+      }),
+    })
 
-      // 2. Register service worker
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-      })
-      await navigator.serviceWorker.ready
-
-      // 3. Subscribe to push
-      // VAPID public key — should be configured via env var
-      const vapidPublicKey =
-        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ??
-        ''
-
-      if (!vapidPublicKey) {
-        console.warn('[PushBanner] VAPID public key not configured — skipping push subscription')
-        setPermission('granted')
-        return
-      }
-
-      const pushSubscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
-      })
-
-      // 4. Send subscription to our API
-      const subData = pushSubscription.toJSON()
-      const response = await fetch('/api/subscribe/push', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subscription: {
-            endpoint: subData.endpoint,
-            keys: subData.keys,
-          },
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to register push subscription on server')
-      }
-
-      setPermission('granted')
-    } catch (error) {
-      console.error('[PushBanner] Subscription failed:', error)
-      setErrorMsg(
-        error instanceof Error ? error.message : 'Could not enable notifications'
-      )
-      setPermission('error')
+    if (!response.ok) {
+      throw new Error('Failed to register push subscription on server')
     }
+
+    notifyChange()
   }, [])
 
   const handleDismiss = useCallback(() => {
-    setPermission('dismissed')
-    localStorage.setItem('push-banner-dismissed', 'true')
+    localStorage.setItem(DISMISS_KEY, 'true')
+    window.dispatchEvent(new Event(PERMISSION_CHANGE_EVENT))
   }, [])
 
   // Don't render if granted, denied, dismissed, or unsupported
@@ -207,7 +205,7 @@ export function PushBanner() {
   )
 }
 
-// ─── Helper: base64 → Uint8Array for VAPID applicationServerKey ──
+// ─── Helper: base64 → Uint8Array for VAPID applicationServerKey ───
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')

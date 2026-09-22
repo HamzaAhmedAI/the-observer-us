@@ -1,5 +1,5 @@
 /* ============================================================
-   The Observer US — Dynamic RSS Feed
+   The Observer US — RSS Feed with Auto-Discovery Link
    ============================================================ */
 
 import { getArticles } from '@/lib/cms'

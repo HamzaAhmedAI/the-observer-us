@@ -1,6 +1,7 @@
 /* ============================================================
    The Observer US — Push Notification Dispatcher
    Batches push notifications to subscribers by category.
+   Uses dynamic import for web-push to avoid require().
    ============================================================ */
 
 import { getPushSubscriptionsByCategory } from '@/lib/db'
@@ -10,7 +11,7 @@ import type { PushPayload } from './templates'
 // web-push is optional — only loaded when VAPID keys are configured
 let webpush: typeof import('web-push') | null = null
 
-function ensureWebPush() {
+async function ensureWebPush(): Promise<boolean> {
   if (webpush) return true
 
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
@@ -23,7 +24,7 @@ function ensureWebPush() {
 
   try {
     // Dynamic import — web-push is Node-only
-    webpush = require('web-push')
+    webpush = await import('web-push')
     webpush!.setVapidDetails(
       'mailto:push@theObserver.com',
       publicKey,
@@ -86,7 +87,7 @@ async function dispatchToCategory(
   }
 
   // Check if web-push is available
-  if (!ensureWebPush()) {
+  if (!(await ensureWebPush())) {
     // Log the notification instead
     console.log('[PushDispatcher] Push log:', {
       category,

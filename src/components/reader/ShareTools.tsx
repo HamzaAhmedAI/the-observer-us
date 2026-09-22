@@ -1,3 +1,8 @@
+/* ============================================================
+   The Observer US — Share Tools
+   Native share API with clipboard fallback and dropdown options.
+   ============================================================ */
+
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
@@ -26,6 +31,17 @@ export function ShareTools({ url, title, className = '' }: ShareToolsProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      setShareError('Could not access clipboard. Try selecting and copying the URL manually.')
+      setTimeout(() => setShareError(null), 4000)
+    }
+  }, [])
+
   const handleShare = useCallback(async () => {
     setShareError(null)
     setMenuOpen(false)
@@ -48,18 +64,7 @@ export function ShareTools({ url, title, className = '' }: ShareToolsProps) {
 
     // Fallback: copy link to clipboard
     await copyToClipboard(url)
-  }, [url, title])
-
-  const copyToClipboard = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    } catch {
-      setShareError('Could not access clipboard. Try selecting and copying the URL manually.')
-      setTimeout(() => setShareError(null), 4000)
-    }
-  }, [])
+  }, [url, title, copyToClipboard])
 
   const handleCopyLink = useCallback(() => {
     copyToClipboard(url)
