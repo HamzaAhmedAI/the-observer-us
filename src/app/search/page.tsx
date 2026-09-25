@@ -32,7 +32,7 @@ export default async function SearchPage({ searchParams }: Props) {
   // Strip HTML/script tags from query for defense-in-depth
   const query = (q || '').replace(/<[^>]*>/g, '').trim() || ''
 
-  const results: Awaited<ReturnType<typeof getArticles>> = { data: [], total: 0, page: 1, pageSize: 12, hasMore: false }
+  let results: Awaited<ReturnType<typeof getArticles>> = { data: [], total: 0, page: 1, pageSize: 12, hasMore: false }
 
   try {
     const [articlesData] = await Promise.all([
