@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { Bell, Envelope, Check, X, ArrowLeft } from '@phosphor-icons/react'
 import Link from 'next/link'
 

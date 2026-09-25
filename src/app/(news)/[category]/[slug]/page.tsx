@@ -6,7 +6,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticleBySlug, getRelatedArticles, getArticles } from '@/lib/cms'
+import { getArticleBySlug, getArticles } from '@/lib/cms'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
 import { JsonLd } from '@/components/analytics/JsonLd'
 import { BookmarkButton } from '@/components/reader/BookmarkButton'
@@ -17,7 +17,6 @@ import { MostRead } from '@/components/reader/MostRead'
 import { RelativeTime } from '@/components/reader/RelativeTime'
 import { ViewBeacon } from '@/components/analytics/ViewBeacon'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
-import { isArchived } from '@/lib/revalidate'
 import { isLive } from '@/lib/relative-time'
 import type { Metadata } from 'next'
 
@@ -100,13 +99,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  weekday: 'long',
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric',
-})
-
 export default async function ArticlePage({ params }: Props) {
   const { category, slug } = params
 
@@ -116,8 +108,6 @@ export default async function ArticlePage({ params }: Props) {
   // even if other layers miss it.
   const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/ // lowercase letters/digits/hyphens
   const VALID_SLUG = /^[a-z0-9][a-z0-9-]*$/ // lowercase letters/digits/hyphens
-  const SAFE_CATEGORIES = new Set(['politics','technology','business','sports',
-    'entertainment','health','science','world'])
 
   if (
     !VALID_CATEGORY.test(category) ||

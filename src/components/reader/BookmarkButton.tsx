@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Bookmark, BookmarkSimple } from '@phosphor-icons/react'
 
 interface BookmarkButtonProps {

@@ -23,7 +23,7 @@ export async function sendEmail(payload: EmailPayload): Promise<void> {
   // await resend.emails.send({ from, to, subject, html })
 
   // Dev fallback — log instead of sending
-  console.log('[Email] Would send:', { to, subject, htmlLength: html.length })
+  console.log('[Email] Would send:', { from, to, subject, htmlLength: html.length })
 }
 
 /**

@@ -3,10 +3,9 @@
    Full-text article search. RSC — zero client JS.
    ============================================================ */
 
-import { notFound } from 'next/navigation'
 import { ArticleCard } from '@/components/reader/ArticleCard'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
-import { getArticles, getCategories } from '@/lib/cms'
+import { getArticles } from '@/lib/cms'
 import type { Metadata } from 'next'
 
 export const revalidate = 300
@@ -33,16 +32,13 @@ export default async function SearchPage({ searchParams }: Props) {
   // Strip HTML/script tags from query for defense-in-depth
   const query = (q || '').replace(/<[^>]*>/g, '').trim() || ''
 
-  let results: Awaited<ReturnType<typeof getArticles>> = { data: [], total: 0, page: 1, pageSize: 12, hasMore: false }
-  let categories: Awaited<ReturnType<typeof getCategories>> = []
+  const results: Awaited<ReturnType<typeof getArticles>> = { data: [], total: 0, page: 1, pageSize: 12, hasMore: false }
 
   try {
-    const [articlesData, categoriesData] = await Promise.all([
+    const [articlesData] = await Promise.all([
       getArticles({ limit: 24 }),
-      getCategories(),
     ])
     results = articlesData
-    categories = categoriesData
   } catch (error) {
     console.error('SearchPage: fetch failed', error)
   }

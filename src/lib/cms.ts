@@ -8,9 +8,6 @@
    ============================================================ */
 
 import type { Article, Author, Category, Media, PaginatedResponse } from '@/types/article'
-import {
-  REVALIDATE_ARTICLE,
-} from '@/lib/revalidate'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
@@ -27,31 +24,6 @@ async function getP(): Promise<P> {
 
 // ─── Configuration ──────────────────────────────────────────
 const CMS_API_URL = process.env.CMS_API_URL ?? ''
-const CMS_API_KEY = process.env.CMS_API_KEY ?? ''
-
-// ─── Helpers ─────────────────────────────────────────────────
-function apiUrl(path: string): string {
-  return `${CMS_API_URL}/api${path}`
-}
-
-async function fetchCMS<T>(path: string, options?: RequestInit, revalidate = 3600): Promise<T> {
-  const url = apiUrl(path)
-
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(CMS_API_KEY ? { Authorization: `Bearer ${CMS_API_KEY}` } : {}),
-    },
-    next: { revalidate },
-    ...options,
-  })
-
-  if (!response.ok) {
-    throw new Error(`CMS fetch failed: ${response.status} ${response.statusText}`)
-  }
-
-  return response.json()
-}
 
 // ─── Cache Helpers ───────────────────────────────────────────
 // When no CMS is configured, return mock data for development
@@ -381,6 +353,3 @@ function getMockArticleBySlug(category: string, slug: string): Article | null {
   return result.data.find((a) => a.slug === slug) ?? null
 }
 
-function getMockAuthorBySlug(slug: string): Author | null {
-  return MOCK_AUTHORS.find((a) => a.slug === slug) ?? null
-}

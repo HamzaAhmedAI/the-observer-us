@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useCallback, useState, useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import { Bell, X, BellSlash } from '@phosphor-icons/react'
 
 type PermissionState = 'idle' | 'loading' | 'granted' | 'denied' | 'error' | 'dismissed'
@@ -36,8 +36,6 @@ export function PushBanner() {
     getPermissionSnapshot,
     () => 'idle',
   )
-  const [errorMsg, setErrorMsg] = useState('')
-
   const handleSubscribe = useCallback(async () => {
     // Force re-read by dispatching event after async operations
     const notifyChange = () => window.dispatchEvent(new Event(PERMISSION_CHANGE_EVENT))
@@ -135,7 +133,7 @@ export function PushBanner() {
             </p>
             <p className="mt-0.5 text-xs text-[var(--color-text-tertiary)]">
               {permission === 'error'
-                ? errorMsg || 'Please try again or check browser settings.'
+                ? 'Please try again or check browser settings.'
                 : 'Get breaking news alerts delivered straight to your browser.'}
             </p>
 
