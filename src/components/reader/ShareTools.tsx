@@ -15,6 +15,18 @@ export function ShareTools({ url, title, className = '' }: ShareToolsProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
+  // Define copyToClipboard first so it can be used in other callbacks
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      setShareError('Could not access clipboard. Try selecting and copying the URL manually.')
+      setTimeout(() => setShareError(null), 4000)
+    }
+  }, [])
+
   // Close menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -48,18 +60,7 @@ export function ShareTools({ url, title, className = '' }: ShareToolsProps) {
 
     // Fallback: copy link to clipboard
     await copyToClipboard(url)
-  }, [url, title])
-
-  const copyToClipboard = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    } catch {
-      setShareError('Could not access clipboard. Try selecting and copying the URL manually.')
-      setTimeout(() => setShareError(null), 4000)
-    }
-  }, [])
+  }, [url, title, copyToClipboard])
 
   const handleCopyLink = useCallback(() => {
     copyToClipboard(url)

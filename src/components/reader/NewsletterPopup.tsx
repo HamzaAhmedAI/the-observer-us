@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { X, Envelope } from '@phosphor-icons/react'
+import { logger } from '@/lib/logger'
 
 const DISMISS_KEY = 'newsletter-popup-dismissed'
 const SHOW_AFTER_MS = 30_000
@@ -30,7 +31,9 @@ export function NewsletterPopup() {
           return
         }
       }
-    } catch {}
+    } catch (err) {
+      logger.warn('[NewsletterPopup] localStorage read failed:', { err })
+    }
 
     let timer: ReturnType<typeof setTimeout> | null = null
     const trigger = () => setOpen(true)
@@ -52,7 +55,8 @@ export function NewsletterPopup() {
   const close = (permanent = true) => {
     setOpen(false)
     if (permanent) {
-      try { localStorage.setItem(DISMISS_KEY, String(Date.now())) } catch {}
+      try { localStorage.setItem(DISMISS_KEY, String(Date.now())) }
+      catch (err) { logger.warn('[NewsletterPopup] localStorage write failed:', { err }) }
     }
   }
 
@@ -64,12 +68,13 @@ export function NewsletterPopup() {
       const res = await fetch('/api/subscribe/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'popup' }),
+        body: JSON.stringify({ email, categories: [], source: 'popup' }),
       })
       if (!res.ok) throw new Error('Subscribe failed')
       setSubmitted(true)
       setTimeout(() => close(true), 2200)
     } catch (err) {
+      logger.error('[NewsletterPopup] Subscribe failed:', { err })
       setError('Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)

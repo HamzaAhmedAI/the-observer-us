@@ -5,6 +5,7 @@
    ============================================================ */
 
 import { NextResponse } from 'next/server'
+import { logger } from '@/lib/logger'
 import { getArticles } from '@/lib/cms'
 import { dispatchDailyDigest } from '@/lib/notifications/email'
 import { recordNotificationEvent } from '@/lib/notifications/analytics'
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
     const { data: articles } = await getArticles({ page: 1, limit: 5 })
 
     if (!articles || articles.length === 0) {
-      console.log('[Digest] No articles found — skipping.')
+      logger.info('[Digest] No articles found — skipping.')
       return NextResponse.json({
         success: true,
         message: 'No articles to digest.',
@@ -53,7 +54,7 @@ export async function GET(request: Request) {
       sentAt: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('Digest error:', error)
+    logger.error('Digest error:', { error })
     return NextResponse.json({ error: 'Digest dispatch failed.' }, { status: 500 })
   }
 }

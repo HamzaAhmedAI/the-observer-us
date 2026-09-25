@@ -4,6 +4,7 @@
    ============================================================ */
 
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 // ─── Client Initialization ──────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL ?? ''
@@ -59,7 +60,7 @@ export async function createSubscriber(
   categories: string[] = []
 ): Promise<{ data?: Subscriber; error?: string }> {
   if (USE_MOCK) {
-    console.log('[DB Mock] createSubscriber:', { email, categories })
+    logger.debug('[DB Mock] createSubscriber:', { email, categories })
     return { data: { id: crypto.randomUUID(), email, categories, is_active: true, subscribed_at: new Date().toISOString(), updated_at: new Date().toISOString() } }
   }
 
@@ -101,7 +102,7 @@ export async function updateSubscriberCategories(
   categories: string[]
 ): Promise<{ data?: Subscriber; error?: string }> {
   if (USE_MOCK) {
-    console.log('[DB Mock] updateCategories:', { email, categories })
+    logger.debug('[DB Mock] updateCategories:', { email, categories })
     return { data: { id: crypto.randomUUID(), email, categories, is_active: true, subscribed_at: new Date().toISOString(), updated_at: new Date().toISOString() } }
   }
 
@@ -123,7 +124,7 @@ export async function deleteSubscriber(
   email: string
 ): Promise<{ error?: string }> {
   if (USE_MOCK) {
-    console.log('[DB Mock] deleteSubscriber:', { email })
+    logger.debug('[DB Mock] deleteSubscriber:', { email })
     return {}
   }
 
@@ -170,7 +171,7 @@ export async function createPushSubscription(
   }
 ): Promise<{ data?: PushSubscription; error?: string }> {
   if (USE_MOCK) {
-    console.log('[DB Mock] createPushSubscription:', subscription)
+    logger.debug('[DB Mock] createPushSubscription:', subscription)
     return { data: { id: crypto.randomUUID(), ...subscription, categories: subscription.categories ?? [], created_at: new Date().toISOString() } }
   }
 
@@ -210,7 +211,7 @@ export async function deletePushSubscription(
   endpoint: string
 ): Promise<{ error?: string }> {
   if (USE_MOCK) {
-    console.log('[DB Mock] deletePushSubscription:', { endpoint })
+    logger.debug('[DB Mock] deletePushSubscription:', { endpoint })
     return {}
   }
 

@@ -7,6 +7,7 @@
 'use client'
 
 import { useReportWebVitals } from 'next/web-vitals'
+import { logger } from '@/lib/logger'
 
 const METRIC_LABELS: Record<string, string> = {
   LCP: 'LCP',
@@ -20,7 +21,7 @@ export function WebVitals() {
   useReportWebVitals((metric) => {
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[WebVitals] ${metric.name}: ${metric.value.toFixed(2)} (${metric.rating})`)
+      logger.debug(`[WebVitals] ${metric.name}: ${metric.value.toFixed(2)} (${metric.rating})`)
       return
     }
 
@@ -50,7 +51,7 @@ export function WebVitals() {
 
       // Log warning for poor ratings
       if (metric.rating === 'poor') {
-        console.warn(
+        logger.warn(
           `[WebVitals] Poor ${metric.name}: ${metric.value.toFixed(2)} — investigate ${METRIC_LABELS[metric.name] ?? metric.name} optimization`
         )
       }

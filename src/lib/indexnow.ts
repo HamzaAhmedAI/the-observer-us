@@ -3,6 +3,8 @@
    Pings search engines when new articles are published.
    ============================================================ */
 
+import { logger } from '@/lib/logger'
+
 const INDEXNOW_URL = 'https://api.indexnow.org'
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY ?? ''
 const SITE_URL = process.env.SITE_URL ?? 'https://theObserver.com'
@@ -12,7 +14,7 @@ const SITE_URL = process.env.SITE_URL ?? 'https://theObserver.com'
  */
 export async function notifyIndexNow(urlPath: string): Promise<void> {
   if (!INDEXNOW_KEY) {
-    console.warn('[IndexNow] No key configured — skipping ping.')
+    logger.warn('[IndexNow] No key configured — skipping ping.')
     return
   }
 
@@ -29,9 +31,9 @@ export async function notifyIndexNow(urlPath: string): Promise<void> {
     })
 
     if (!response.ok) {
-      console.error(`[IndexNow] Failed: ${response.status} ${response.statusText}`)
+      logger.error(`[IndexNow] Failed: ${response.status} ${response.statusText}`)
     }
   } catch (error) {
-    console.error('[IndexNow] Error:', error)
+    logger.error('[IndexNow] Error:', { error })
   }
 }

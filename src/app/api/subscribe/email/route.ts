@@ -5,6 +5,8 @@
 import { NextResponse } from 'next/server'
 import { createSubscriber, deleteSubscriber } from '@/lib/db'
 import { checkRateLimitByIP } from '@/lib/rate-limit'
+import { sendConfirmationEmail } from '@/lib/notifications/email'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: Request) {
   try {
@@ -45,20 +47,19 @@ export async function POST(request: Request) {
     const { error } = await createSubscriber(email, validCategories)
     if (error) throw new Error(error)
 
-    // TODO: Send confirmation email via Resend
-    // await resend.emails.send({
-    //   from: 'The Observer US <newsletter@theObserver.com>',
-    //   to: email,
-    //   subject: 'Confirm your subscription',
-    //   html: `<p>Thanks for subscribing!</p>`,
-    // })
+    // Send confirmation email
+    try {
+      await sendConfirmationEmail(email)
+    } catch (emailErr) {
+      logger.error('[Subscribe] Confirmation email failed:', { email, error: emailErr })
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Subscription successful. Check your inbox for confirmation.',
     })
   } catch (error) {
-    console.error('Subscribe error:', error)
+    logger.error('Subscribe error:', { error })
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }
@@ -86,7 +87,7 @@ export async function DELETE(request: Request) {
       message: 'Successfully unsubscribed.',
     })
   } catch (error) {
-    console.error('Unsubscribe error:', error)
+    logger.error('Unsubscribe error:', { error })
     return NextResponse.json(
       { error: 'Failed to unsubscribe. Please try again.' },
       { status: 500 }

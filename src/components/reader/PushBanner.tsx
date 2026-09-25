@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Bell, X, BellSlash } from '@phosphor-icons/react'
+import { logger } from '@/lib/logger'
 
 type PermissionState = 'idle' | 'loading' | 'granted' | 'denied' | 'error' | 'dismissed'
 
@@ -23,12 +24,14 @@ export function PushBanner() {
     }
 
     if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
+      const perm = Notification.permission
+      if (perm === 'granted') {
         setPermission('granted')
-      } else if (Notification.permission === 'denied') {
+      } else if (perm === 'denied') {
         setPermission('denied')
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSubscribe = useCallback(async () => {
@@ -56,7 +59,7 @@ export function PushBanner() {
         ''
 
       if (!vapidPublicKey) {
-        console.warn('[PushBanner] VAPID public key not configured — skipping push subscription')
+        logger.warn('[PushBanner] VAPID public key not configured — skipping push subscription')
         setPermission('granted')
         return
       }
@@ -85,7 +88,7 @@ export function PushBanner() {
 
       setPermission('granted')
     } catch (error) {
-      console.error('[PushBanner] Subscription failed:', error)
+      logger.error('[PushBanner] Subscription failed:', { error })
       setErrorMsg(
         error instanceof Error ? error.message : 'Could not enable notifications'
       )

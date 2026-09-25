@@ -2,14 +2,7 @@
    The Observer US — Web Push Notification Dispatcher
    ============================================================ */
 
-// import webpush from 'web-push'
-
-// TODO: Set VAPID keys
-// webpush.setVapidDetails(
-//   'mailto:push@theObserver.com',
-//   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-//   process.env.VAPID_PRIVATE_KEY!
-// )
+import { logger } from '@/lib/logger'
 
 export interface PushSubscriptionData {
   endpoint: string
@@ -48,7 +41,7 @@ export async function sendPushNotification(
   //   })
   // )
 
-  console.log('[Push] Would send:', { subscription: subscription.endpoint, payload })
+  logger.info('[Push] Would send:', { endpoint: subscription.endpoint, payload })
 }
 
 /**

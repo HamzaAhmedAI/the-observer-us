@@ -27,14 +27,17 @@ export default function PreferencesPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [pageState, setPageState] = useState<PageState>('email-input')
   const [errorMsg, setErrorMsg] = useState('')
-  const [pushStatus, setPushStatus] = useState<'unsupported' | 'default' | 'granted' | 'denied'>('default')
+  const [pushStatus, setPushStatus] = useState<'default' | 'granted' | 'denied' | 'unsupported'>(
+    typeof Notification === 'undefined' ? 'unsupported' : (Notification.permission as 'default' | 'granted' | 'denied')
+  )
 
-  // Check push permission on mount
+  // Listen for push permission changes
   useEffect(() => {
-    if (typeof Notification === 'undefined') {
-      setPushStatus('unsupported')
-    } else {
-      setPushStatus(Notification.permission as 'default' | 'granted' | 'denied')
+    if (typeof Notification === 'undefined') return
+    const handler = () => setPushStatus(Notification.permission as 'default' | 'granted' | 'denied')
+    document.addEventListener('visibilitychange', handler)
+    return () => {
+      document.removeEventListener('visibilitychange', handler)
     }
   }, [])
 

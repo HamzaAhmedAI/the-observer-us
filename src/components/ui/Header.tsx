@@ -8,8 +8,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { List, X, Moon, Sun } from '@phosphor-icons/react'
+import { logger } from '@/lib/logger'
 
 const NAV_LINKS = [
   { label: 'Politics', href: '/politics' },
@@ -26,9 +27,10 @@ const NAV_LINKS = [
 const MENU_ID = 'obv-menu-toggle'
 
 export function Header() {
-  const [mounted, setMounted] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const menuCheckboxRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -38,13 +40,16 @@ export function Header() {
       const dark = stored === 'dark' || (!stored && prefersDark)
       setIsDark(dark)
       document.documentElement.classList.toggle('dark', dark)
-    } catch {}
+    } catch (err) {
+      logger.warn('[Header] Failed to read theme:', { err })
+    }
   }, [])
 
   /* Sync React state with checkbox for icon swap */
   useEffect(() => {
     const cb = document.getElementById(MENU_ID) as HTMLInputElement | null
     if (!cb) return
+    menuCheckboxRef.current = cb
     const handler = () => {
       setMenuOpen(cb.checked)
       document.body.style.overflow = cb.checked ? 'hidden' : ''
@@ -57,7 +62,7 @@ export function Header() {
   }, [])
 
   const closeMenu = useCallback(() => {
-    const cb = document.getElementById(MENU_ID) as HTMLInputElement | null
+    const cb = menuCheckboxRef.current
     if (cb) {
       cb.checked = false
       setMenuOpen(false)

@@ -3,6 +3,8 @@
    Basic tracking for push and email notification delivery.
    ============================================================ */
 
+import { logger } from '@/lib/logger'
+
 export interface NotificationEvent {
   id: string
   type: 'push_sent' | 'push_delivered' | 'push_clicked' | 'push_failed'
@@ -39,7 +41,7 @@ export function recordNotificationEvent(event: Omit<NotificationEvent, 'id' | 't
 
   // Log to console in dev
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Analytics] ${fullEvent.type}:`, {
+    logger.debug(`[Analytics] ${fullEvent.type}:`, {
       category: fullEvent.category,
       recipient: fullEvent.recipient && `${fullEvent.recipient.slice(0, 3)}…`,
       articleSlug: fullEvent.articleSlug,

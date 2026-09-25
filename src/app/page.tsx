@@ -9,7 +9,7 @@ import { ArticleCard } from '@/components/reader/ArticleCard'
 import { FeaturedHero } from '@/components/reader/FeaturedHero'
 import { EmailSubscribe } from '@/components/reader/EmailSubscribe'
 import { getArticles, getCategories } from '@/lib/cms'
-// REVALIDATE_HOMEPAGE = 300 (inlined for Next.js 16 compatibility)
+import { logger } from '@/lib/logger'
 import type { Article, Category } from '@/types/article'
 
 export const revalidate = 300
@@ -36,7 +36,7 @@ export default async function HomePage() {
     latestArticles = articles.data.slice(1, 7)
     categories = cats
   } catch (error) {
-    console.error('Failed to load homepage data:', error)
+    logger.error('Failed to load homepage data:', { error })
   }
 
   // Fetch articles for first 4 categories in parallel, then drop empty sections.

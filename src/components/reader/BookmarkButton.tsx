@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Bookmark, BookmarkSimple } from '@phosphor-icons/react'
+import { logger } from '@/lib/logger'
 
 interface BookmarkButtonProps {
   slug: string
@@ -21,8 +22,8 @@ export function BookmarkButton({ slug, title, className = '' }: BookmarkButtonPr
         const bookmarks = JSON.parse(stored) as Record<string, string>
         setIsBookmarked(!!bookmarks[slug])
       }
-    } catch {
-      // localStorage unavailable or corrupt — treat as not bookmarked
+    } catch (err) {
+      logger.warn('[BookmarkButton] localStorage read failed:', { err })
     }
   }, [slug])
 
@@ -42,8 +43,8 @@ export function BookmarkButton({ slug, title, className = '' }: BookmarkButtonPr
       }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks))
-    } catch {
-      // localStorage full or unavailable — silently fail
+    } catch (err) {
+      logger.error('[BookmarkButton] localStorage write failed:', { err })
     }
   }, [slug, title])
 

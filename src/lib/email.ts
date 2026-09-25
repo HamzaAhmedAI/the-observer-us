@@ -1,10 +1,22 @@
 /* ============================================================
-   The Observer US — Email Client (Resend / Mailchimp)
+   The Observer US — Email Client (Resend)
    ============================================================ */
 
-// TODO: Initialize your preferred email client
-// import { Resend } from 'resend'
-// const resend = new Resend(process.env.RESEND_API_KEY)
+import { Resend } from 'resend'
+import { logger } from './logger'
+
+let resendInstance: Resend | null = null
+
+function getResend(): Resend {
+  if (!resendInstance) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not configured')
+    }
+    resendInstance = new Resend(apiKey)
+  }
+  return resendInstance
+}
 
 export interface EmailPayload {
   to: string | string[]
@@ -14,16 +26,19 @@ export interface EmailPayload {
 }
 
 /**
- * Send an email via the configured provider.
+ * Send an email via Resend.
  */
 export async function sendEmail(payload: EmailPayload): Promise<void> {
   const { to, subject, html, from = 'The Observer US <newsletter@theObserver.com>' } = payload
+  const resend = getResend()
 
-  // TODO: Implement with Resend
-  // await resend.emails.send({ from, to, subject, html })
-
-  // Dev fallback — log instead of sending
-  console.log('[Email] Would send:', { to, subject, htmlLength: html.length })
+  try {
+    const response = await resend.emails.send({ from, to, subject, html })
+    logger.info('Email sent', { to, subject, responseId: (response as { id?: string }).id })
+  } catch (error) {
+    logger.error('Failed to send email', { to, subject, error })
+    throw error
+  }
 }
 
 /**

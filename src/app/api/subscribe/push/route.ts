@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server'
 import { createPushSubscription } from '@/lib/db'
 import { checkRateLimitByIP } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
       message: 'Push subscription registered.',
     })
   } catch (error) {
-    console.error('Push subscribe error:', error)
+    logger.error('Push subscribe error:', { error })
     return NextResponse.json(
       { error: 'Failed to register push subscription.' },
       { status: 500 }

@@ -4,6 +4,7 @@
    ============================================================ */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { LegalPage, LegalSection } from '@/components/reader/LegalPage'
 import { SITE_NAME } from '@/lib/seo'
 
@@ -52,9 +53,9 @@ export default function CookiesPage() {
           You can control or delete cookies through your browser settings at any time. Disabling
           functional cookies may affect features such as saved category preferences or notification
           state. For our broader data practices, see the{' '}
-          <a href="/privacy" className="text-[var(--color-accent)] hover:underline">
+          <Link href="/privacy" className="text-[var(--color-accent)] hover:underline">
             Privacy Policy
-          </a>
+          </Link>
           .
         </p>
       </LegalSection>

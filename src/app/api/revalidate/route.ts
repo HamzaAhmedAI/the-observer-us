@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { logger } from '@/lib/logger'
 
 const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET ?? ''
 
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
       revalidated: [articlePath, `/${category}`, '/'],
     })
   } catch (error) {
-    console.error('Revalidation error:', error)
+    logger.error('Revalidation error:', { error })
     return NextResponse.json(
       { error: 'Revalidation failed.' },
       { status: 500 }

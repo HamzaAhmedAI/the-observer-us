@@ -6,6 +6,7 @@
 
 import { getActiveSubscribers } from '@/lib/db'
 import { sendEmail } from '@/lib/email'
+import { logger } from '@/lib/logger'
 import {
   buildBreakingNewsEmail,
   buildDigestEmail,
@@ -29,12 +30,12 @@ export async function dispatchBreakingNewsEmail(
   const { data: subscribers, error } = await getActiveSubscribers()
 
   if (error) {
-    console.error('[EmailDispatcher] Failed to fetch subscribers:', error)
+    logger.error('[EmailDispatcher] Failed to fetch subscribers:', { error })
     return { sent: 0, failed: 0 }
   }
 
   if (!subscribers || subscribers.length === 0) {
-    console.log('[EmailDispatcher] No active subscribers.')
+    logger.info('[EmailDispatcher] No active subscribers.')
     return { sent: 0, failed: 0 }
   }
 
@@ -44,7 +45,7 @@ export async function dispatchBreakingNewsEmail(
   )
 
   if (matching.length === 0) {
-    console.log(`[EmailDispatcher] No subscribers for category: ${category}`)
+    logger.info(`[EmailDispatcher] No subscribers for category: ${category}`)
     return { sent: 0, failed: 0 }
   }
 
@@ -64,10 +65,10 @@ export async function dispatchBreakingNewsEmail(
       subject: `BREAKING: ${headline.slice(0, 80)}`,
       html: substitutedHtml,
     })
-    console.log(`[EmailDispatcher] Breaking news sent to ${emailAddresses.length} subscribers`)
+    logger.info(`[EmailDispatcher] Breaking news sent to ${emailAddresses.length} subscribers`)
     return { sent: emailAddresses.length, failed: 0 }
   } catch (err) {
-    console.error('[EmailDispatcher] Send failed:', err)
+    logger.error('[EmailDispatcher] Send failed:', { err })
     return { sent: 0, failed: emailAddresses.length }
   }
 }
@@ -87,12 +88,12 @@ export async function dispatchDailyDigest(
   const { data: subscribers, error } = await getActiveSubscribers()
 
   if (error) {
-    console.error('[EmailDispatcher] Failed to fetch subscribers:', error)
+    logger.error('[EmailDispatcher] Failed to fetch subscribers:', { error })
     return { sent: 0, failed: 0 }
   }
 
   if (!subscribers || subscribers.length === 0) {
-    console.log('[EmailDispatcher] No active subscribers for digest.')
+    logger.info('[EmailDispatcher] No active subscribers for digest.')
     return { sent: 0, failed: 0 }
   }
 
@@ -117,10 +118,10 @@ export async function dispatchDailyDigest(
       subject: `Your Daily Digest — ${date}`,
       html: substitutedHtml,
     })
-    console.log(`[EmailDispatcher] Digest sent to ${emailAddresses.length} subscribers`)
+    logger.info(`[EmailDispatcher] Digest sent to ${emailAddresses.length} subscribers`)
     return { sent: emailAddresses.length, failed: 0 }
   } catch (err) {
-    console.error('[EmailDispatcher] Digest send failed:', err)
+    logger.error('[EmailDispatcher] Digest send failed:', { err })
     return { sent: 0, failed: emailAddresses.length }
   }
 }

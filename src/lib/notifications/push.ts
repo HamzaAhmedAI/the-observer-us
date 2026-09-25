@@ -5,33 +5,35 @@
 
 import { getPushSubscriptionsByCategory } from '@/lib/db'
 import { buildBreakingNewsPush, buildArticlePush } from './templates'
+import { logger } from '@/lib/logger'
 import type { PushPayload } from './templates'
 
 // web-push is optional — only loaded when VAPID keys are configured
 let webpush: typeof import('web-push') | null = null
 
-function ensureWebPush() {
+async function ensureWebPush() {
   if (webpush) return true
 
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const privateKey = process.env.VAPID_PRIVATE_KEY
 
   if (!publicKey || !privateKey) {
-    console.warn('[PushDispatcher] VAPID keys not configured — push notifications disabled.')
+    logger.warn('[PushDispatcher] VAPID keys not configured — push notifications disabled.')
     return false
   }
 
   try {
     // Dynamic import — web-push is Node-only
-    webpush = require('web-push')
-    webpush!.setVapidDetails(
+    const module = await import('web-push')
+    webpush = module
+    webpush.setVapidDetails(
       'mailto:push@theObserver.com',
       publicKey,
       privateKey
     )
     return true
   } catch {
-    console.warn('[PushDispatcher] web-push package not installed — push disabled.')
+    logger.warn('[PushDispatcher] web-push package not installed — push disabled.')
     return false
   }
 }
@@ -76,19 +78,18 @@ async function dispatchToCategory(
   const { data: subscriptions, error } = await getPushSubscriptionsByCategory(category)
 
   if (error) {
-    console.error('[PushDispatcher] Failed to fetch subscriptions:', error)
+    logger.error('[PushDispatcher] Failed to fetch subscriptions:', { error })
     return { sent: 0, failed: 0 }
   }
 
   if (!subscriptions || subscriptions.length === 0) {
-    console.log(`[PushDispatcher] No push subscribers for category: ${category}`)
+    logger.info(`[PushDispatcher] No push subscribers for category: ${category}`)
     return { sent: 0, failed: 0 }
   }
 
   // Check if web-push is available
-  if (!ensureWebPush()) {
-    // Log the notification instead
-    console.log('[PushDispatcher] Push log:', {
+  if (!(await ensureWebPush())) {
+    logger.info('[PushDispatcher] Push log:', {
       category,
       subscribers: subscriptions.length,
       payload,
@@ -100,14 +101,14 @@ async function dispatchToCategory(
   const BATCH_SIZE = 50
   let sent = 0
   let failed = 0
-  const wp = webpush // narrowed local reference
+  const wp = webpush! // narrowed local reference, ensured above
 
   for (let i = 0; i < subscriptions.length; i += BATCH_SIZE) {
     const batch = subscriptions.slice(i, i + BATCH_SIZE)
 
     const results = await Promise.allSettled(
       batch.map((sub) =>
-        wp!.sendNotification(
+        wp.sendNotification(
           {
             endpoint: sub.endpoint,
             keys: {
@@ -132,11 +133,11 @@ async function dispatchToCategory(
         sent++
       } else {
         failed++
-        console.warn('[PushDispatcher] Send failed:', result.reason)
+        logger.warn('[PushDispatcher] Send failed:', { reason: result.reason })
       }
     }
   }
 
-  console.log(`[PushDispatcher] Sent ${sent}, failed ${failed} to category: ${category}`)
+  logger.info(`[PushDispatcher] Sent ${sent}, failed ${failed} to category: ${category}`)
   return { sent, failed }
 }

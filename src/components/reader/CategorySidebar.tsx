@@ -6,6 +6,7 @@
 
 import Link from 'next/link'
 import { getArticles, getCategories } from '@/lib/cms'
+import { logger } from '@/lib/logger'
 import type { Category } from '@/types/article'
 
 interface CategorySidebarProps {
@@ -58,7 +59,7 @@ export async function CategorySidebar({ currentCategory }: CategorySidebarProps)
       publishedAt: a.publishedAt,
     }))
   } catch (error) {
-    console.error('CategorySidebar: failed to fetch data', error)
+    logger.error('CategorySidebar: failed to fetch data', { error })
   }
 
   if (categories.length === 0 && trending.length === 0) {

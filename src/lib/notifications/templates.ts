@@ -30,7 +30,7 @@ export function buildBreakingNewsPush(
     url: articleUrl,
     icon: '/icon-192.png',
     image: thumbnailUrl,
-    badge: '/badge-72.png',
+    badge: '/icon-192.png',
   }
 }
 
@@ -49,7 +49,7 @@ export function buildArticlePush(
     url: articleUrl,
     icon: '/icon-192.png',
     image: thumbnailUrl,
-    badge: '/badge-72.png',
+    badge: '/icon-192.png',
   }
 }
 

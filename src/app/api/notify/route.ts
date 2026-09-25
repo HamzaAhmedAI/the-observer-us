@@ -9,6 +9,7 @@ import { SITE_URL } from '@/lib/seo'
 import { dispatchBreakingNewsPush } from '@/lib/notifications/push'
 import { dispatchBreakingNewsEmail } from '@/lib/notifications/email'
 import { recordNotificationEvent } from '@/lib/notifications/analytics'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
       await fetch(`https://www.google.com/ping?sitemap=${SITE_URL}/news-sitemap.xml`)
       dispatchResults.google = 'pinged'
     } catch {
-      console.warn('[Notify] Google ping failed — skipping.')
+      logger.warn('[Notify] Google ping failed — skipping.')
       dispatchResults.google = 'skipped'
     }
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       })
       dispatchResults.indexnow = 'pinged'
     } catch {
-      console.warn('[Notify] IndexNow ping failed — skipping.')
+      logger.warn('[Notify] IndexNow ping failed — skipping.')
       dispatchResults.indexnow = 'skipped'
     }
 
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
       notified: dispatchResults,
     })
   } catch (error) {
-    console.error('Notify error:', error)
+    logger.error('Notify error:', { error })
     return NextResponse.json({ error: 'Notification dispatch failed.' }, { status: 500 })
   }
 }

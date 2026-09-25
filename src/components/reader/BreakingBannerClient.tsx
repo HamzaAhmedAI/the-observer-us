@@ -7,7 +7,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { logger } from '@/lib/logger'
 
 interface BreakingBannerClientProps {
   href: string
@@ -24,7 +25,18 @@ export function BreakingBannerClient({ href, label }: BreakingBannerClientProps)
     setMounted(true)
     try {
       if (sessionStorage.getItem(DISMISS_KEY) === '1') setDismissed(true)
-    } catch {}
+    } catch (err: unknown) {
+      logger.warn('[BreakingBanner] sessionStorage read failed:', { err })
+    }
+  }, [])
+
+  const dismiss = useCallback(() => {
+    setDismissed(true)
+    try {
+      sessionStorage.setItem(DISMISS_KEY, '1')
+    } catch (err: unknown) {
+      logger.warn('[BreakingBanner] sessionStorage write failed:', { err })
+    }
   }, [])
 
   if (!mounted || dismissed) return null
@@ -54,10 +66,7 @@ export function BreakingBannerClient({ href, label }: BreakingBannerClientProps)
         </Link>
         <button
           type="button"
-          onClick={() => {
-            setDismissed(true)
-            try { sessionStorage.setItem(DISMISS_KEY, '1') } catch {}
-          }}
+          onClick={dismiss}
           className="rounded p-1 transition-opacity hover:opacity-80"
           aria-label="Dismiss breaking news banner"
         >
