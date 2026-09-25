@@ -29,6 +29,126 @@ const CMS_API_URL = process.env.CMS_API_URL ?? ''
 // When no CMS is configured, return mock data for development
 const USE_MOCK = !CMS_API_URL
 
+// ─── Normalization Helpers ───────────────────────────────────
+
+// Payload returns `tags` as [{ id, tag }] objects at depth>=1. The Article
+// type (and the UI) expect string[]. Convert defensively.
+function normalizeTags<T extends Article>(a: T): T {
+  const tags = (a as Article).tags as unknown as Array<string | { tag?: string }> | undefined
+  if (Array.isArray(tags)) {
+    ;(a as Article).tags = tags
+      .map((t) => (typeof t === 'string' ? t : (t as { tag?: string })?.tag ?? ''))
+      .filter(Boolean) as string[]
+  }
+  return a
+}
+
+// Normalize Media object to ensure required fields exist.
+function normalizeMedia(m: Media | null | undefined): Media {
+  if (!m || !m.url) {
+    return {
+      url: 'https://picsum.photos/seed/placeholder/1200/675',
+      width: 1200,
+      height: 675,
+      alt: 'Placeholder image',
+    }
+  }
+  return {
+    url: m.url,
+    width: m.width ?? 1200,
+    height: m.height ?? 675,
+    alt: m.alt ?? 'Article image',
+    caption: m.caption,
+    blurDataURL: m.blurDataURL,
+  }
+}
+
+// Normalize Author object to ensure required fields exist.
+function normalizeAuthor(a: Author | null | undefined): Author {
+  if (!a || !a.id || !a.name || !a.slug) {
+    return {
+      id: 'fallback-author',
+      slug: 'hamza-ahmed',
+      name: 'Hamza Ahmed',
+      avatar: null,
+      bio: 'Founder and Editor-in-Chief of The Observer US.',
+      role: 'Founder & Editor-in-Chief',
+    }
+  }
+  return {
+    ...a,
+    avatar: a.avatar ? normalizeMedia(a.avatar) : null,
+    bio: a.bio ?? '',
+    role: a.role ?? 'Contributor',
+    linkedin: a.linkedin ?? null,
+    twitter: a.twitter ?? null,
+    website: a.website ?? null,
+  }
+}
+
+// Normalize Category object to ensure required fields exist.
+function normalizeCategory(c: Category | null | undefined): Category {
+  if (!c || !c.slug || !c.name) {
+    return {
+      id: 'fallback-category',
+      slug: 'politics',
+      name: 'Politics',
+      description: '',
+      color: '#2563eb',
+      articleCount: 0,
+    }
+  }
+  return {
+    ...c,
+    description: c.description ?? '',
+    color: c.color ?? '#2563eb',
+    articleCount: c.articleCount ?? 0,
+  }
+}
+
+// Normalize article data to ensure all required fields exist and are valid.
+// Filters out malformed records that would cause build/prerender crashes.
+function normalizeArticle<T extends Article>(a: T): T | null {
+  // Ensure required fields exist
+  if (!a?.id || !a?.slug || !a?.title || !a?.excerpt || !a?.content) {
+    console.warn('[CMS] Skipping article with missing required fields:', a?.id ?? 'unknown')
+    return null
+  }
+
+  // Ensure category is fully populated
+  a.category = normalizeCategory(a.category)
+
+  // Ensure author is fully populated
+  a.author = normalizeAuthor(a.author)
+
+  // Ensure featuredImage exists with all required fields
+  a.featuredImage = normalizeMedia(a.featuredImage)
+
+  // Ensure tags array exists
+  if (!Array.isArray(a.tags)) {
+    a.tags = []
+  }
+
+  // Ensure publishedAt/updatedAt exist
+  if (!a.publishedAt) a.publishedAt = new Date().toISOString()
+  if (!a.updatedAt) a.updatedAt = new Date().toISOString()
+
+  // Ensure SEO object exists
+  if (!a.seo) {
+    a.seo = { title: a.title, description: a.excerpt }
+  }
+
+  // Ensure boolean fields have defaults
+  if (typeof a.isBreaking !== 'boolean') a.isBreaking = false
+  if (typeof a.isFeatured !== 'boolean') a.isFeatured = false
+
+  // Ensure numeric fields have defaults
+  if (typeof a.readTime !== 'number') a.readTime = 5
+  if (typeof a.viewCount !== 'number') a.viewCount = 0
+
+  return a
+}
+
 // ─── Article Operations ──────────────────────────────────────
 export async function getArticles(options?: {
   category?: string
@@ -60,25 +180,19 @@ export async function getArticles(options?: {
     hasNextPage: boolean
   }
 
+  // Normalize and filter out malformed articles
+  const normalized = result.docs
+    .map(normalizeTags)
+    .map(normalizeArticle)
+    .filter((a): a is Article => a !== null)
+
   return {
-    data: result.docs.map(normalizeTags),
-    total: result.totalDocs,
+    data: normalized,
+    total: normalized.length,
     page: result.page,
     pageSize: result.limit,
     hasMore: result.hasNextPage,
   }
-}
-
-// Payload returns `tags` as [{ id, tag }] objects at depth>=1. The Article
-// type (and the UI) expect string[]. Convert defensively.
-function normalizeTags<T extends Article>(a: T): T {
-  const tags = (a as Article).tags as unknown as Array<string | { tag?: string }> | undefined
-  if (Array.isArray(tags)) {
-    ;(a as Article).tags = tags
-      .map((t) => (typeof t === 'string' ? t : (t as { tag?: string })?.tag ?? ''))
-      .filter(Boolean) as string[]
-  }
-  return a
 }
 
 export async function getArticleBySlug(
@@ -102,7 +216,8 @@ export async function getArticleBySlug(
       limit: 1,
     })
     const doc = (result.docs as Article[])[0]
-    return doc ? normalizeTags(doc) : null
+    const normalized = doc ? normalizeTags(doc) : null
+    return normalized ? normalizeArticle(normalized) : null
   } catch {
     return null
   }
@@ -130,7 +245,10 @@ export async function getRelatedArticles(options: {
       sort: '-publishedAt',
       limit: options.limit ?? 4,
     })
-    return (result.docs as Article[]).map(normalizeTags)
+    return (result.docs as Article[])
+      .map(normalizeTags)
+      .map(normalizeArticle)
+      .filter((a): a is Article => a !== null)
   } catch {
     return []
   }
@@ -157,7 +275,10 @@ export async function getMostRead(options?: {
       sort: '-viewCount',
       limit: options?.limit ?? 5,
     })
-    return (result.docs as Article[]).map(normalizeTags)
+    return (result.docs as Article[])
+      .map(normalizeTags)
+      .map(normalizeArticle)
+      .filter((a): a is Article => a !== null)
   } catch {
     return []
   }
@@ -180,7 +301,10 @@ export async function getBreakingArticles(limit = 1): Promise<Article[]> {
       sort: '-publishedAt',
       limit,
     })
-    return (result.docs as Article[]).map(normalizeTags)
+    return (result.docs as Article[])
+      .map(normalizeTags)
+      .map(normalizeArticle)
+      .filter((a): a is Article => a !== null)
   } catch {
     return []
   }
@@ -199,7 +323,7 @@ export async function getCategories(): Promise<Category[]> {
       sort: 'name',
       limit: 100,
     })
-    return result.docs as Category[]
+    return (result.docs as Category[]).map(normalizeCategory)
   } catch {
     return []
   }
@@ -229,7 +353,7 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
       })
       doc.avatar = mediaResult as unknown as Media
     }
-    return doc
+    return normalizeAuthor(doc)
   } catch {
     return null
   }
@@ -352,4 +476,3 @@ function getMockArticleBySlug(category: string, slug: string): Article | null {
   const result = getMockArticles({ category, limit: 50 })
   return result.data.find((a) => a.slug === slug) ?? null
 }
-
