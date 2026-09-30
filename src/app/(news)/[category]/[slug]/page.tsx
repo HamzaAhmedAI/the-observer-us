@@ -110,32 +110,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Article Not Found' }
   }
 
+  // Ensure all nested fields exist for metadata generation
+  const safe = ensureArticleMetadata(article)
+  if (!safe) {
+    return { title: 'Article Not Found' }
+  }
+
   return {
-    title: article.seo.title,
-    description: article.seo.description,
+    title: safe.seo.title,
+    description: safe.seo.description,
     alternates: {
-      canonical: `${SITE_URL}/${article.category.slug}/${article.slug}`,
+      canonical: `${SITE_URL}/${safe.category.slug}/${safe.slug}`,
     },
     openGraph: {
-      title: article.seo.title,
-      description: article.seo.description,
+      title: safe.seo.title,
+      description: safe.seo.description,
       type: 'article',
-      publishedTime: article.publishedAt,
-      modifiedTime: article.updatedAt,
-      authors: [article.author.name],
+      publishedTime: safe.publishedAt,
+      modifiedTime: safe.updatedAt,
+      authors: [safe.author.name],
       images: [
         {
-          url: article.featuredImage.url,
-          width: article.featuredImage.width,
-          height: article.featuredImage.height,
-          alt: article.featuredImage.alt,
+          url: safe.featuredImage.url,
+          width: safe.featuredImage.width,
+          height: safe.featuredImage.height,
+          alt: safe.featuredImage.alt,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: article.seo.title,
-      description: article.seo.description,
+      title: safe.seo.title,
+      description: safe.seo.description,
     },
     robots: {
       index: true,
@@ -180,28 +186,34 @@ export default async function ArticlePage({ params }: Props) {
     notFound()
   }
 
+  // Ensure all nested fields exist for rendering and JsonLd
+  const safe = ensureArticleMetadata(article)
+  if (!safe) {
+    notFound()
+  }
+
   return (
     <>
       {/* Fire one page-view per article render */}
-      <ViewBeacon category={article.category.slug} slug={article.slug} />
+      <ViewBeacon category={safe.category.slug} slug={safe.slug} />
 
       {/* JSON-LD Structured Data */}
       <JsonLd
-        title={article.title}
-        description={article.excerpt}
-        url={`${SITE_URL}/${article.category.slug}/${article.slug}`}
-        imageUrl={article.featuredImage.url}
-        imageWidth={article.featuredImage.width}
-        imageHeight={article.featuredImage.height}
-        datePublished={article.publishedAt}
-        dateModified={article.updatedAt}
-        authorName={article.author.name}
-        authorUrl={article.author.slug ? `${SITE_URL}/author/${article.author.slug}` : SITE_URL}
+        title={safe.title}
+        description={safe.excerpt}
+        url={`${SITE_URL}/${safe.category.slug}/${safe.slug}`}
+        imageUrl={safe.featuredImage.url}
+        imageWidth={safe.featuredImage.width}
+        imageHeight={safe.featuredImage.height}
+        datePublished={safe.publishedAt}
+        dateModified={safe.updatedAt}
+        authorName={safe.author.name}
+        authorUrl={safe.author.slug ? `${SITE_URL}/author/${safe.author.slug}` : SITE_URL}
         publisherName={SITE_NAME}
         breadcrumbs={[
           { name: 'Home', url: SITE_URL },
-          { name: article.category.name, url: `${SITE_URL}/${article.category.slug}` },
-          { name: article.title, url: `${SITE_URL}/${article.category.slug}/${article.slug}` },
+          { name: safe.category.name, url: `${SITE_URL}/${safe.category.slug}` },
+          { name: safe.title, url: `${SITE_URL}/${safe.category.slug}/${safe.slug}` },
         ]}
       />
 
@@ -218,46 +230,46 @@ export default async function ArticlePage({ params }: Props) {
             </Link>
             <span className="mx-2">/</span>
             <Link
-              href={`/${article.category.slug}`}
+              href={`/${safe.category.slug}`}
               className="hover:text-[var(--color-text-primary)]"
-              style={{ color: `var(--color-${article.category.slug})` }}
+              style={{ color: `var(--color-${safe.category.slug})` }}
             >
-              {article.category.name}
+              {safe.category.name}
             </Link>
             <span className="mx-2">/</span>
-            <span className="text-[var(--color-text-secondary)]">{article.title.slice(0, 50)}...</span>
+            <span className="text-[var(--color-text-secondary)]">{safe.title.slice(0, 50)}...</span>
           </nav>
 
           {/* Article Header */}
           <header className="mb-8">
-            {article.isBreaking && (
+            {safe.isBreaking && (
               <span className="mb-4 inline-block rounded bg-[var(--color-brand)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[var(--color-text-on-brand)]">
                 Breaking News
               </span>
             )}
 
             <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-              {article.title}
+              {safe.title}
             </h1>
 
             <p className="mb-6 text-lg text-[var(--color-text-secondary)]">
-              {article.excerpt}
+              {safe.excerpt}
             </p>
 
             {/* Meta */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
               <div className="flex items-center gap-2">
                 <Link
-                  href={`/author/${article.author.slug}`}
+                  href={`/author/${safe.author.slug}`}
                   className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[var(--color-surface-alt)]"
-                  aria-label={`Author profile: ${article.author.name}`}
+                  aria-label={`Author profile: ${safe.author.name}`}
                 >
-                  {article.author.avatar?.url ? (
+                  {safe.author.avatar?.url ? (
                     <Image
-                      src={article.author.avatar.url}
-                      alt={article.author.name}
-                      width={article.author.avatar.width || 40}
-                      height={article.author.avatar.height || 40}
+                      src={safe.author.avatar.url}
+                      alt={safe.author.name}
+                      width={safe.author.avatar.width || 40}
+                      height={safe.author.avatar.height || 40}
                       className="h-10 w-10 rounded-full object-cover"
                       unoptimized
                     />
@@ -267,34 +279,34 @@ export default async function ArticlePage({ params }: Props) {
                 </Link>
                 <div>
                   <Link
-                    href={`/author/${article.author.slug}`}
+                    href={`/author/${safe.author.slug}`}
                     className="block font-medium text-[var(--color-text-primary)] hover:text-[var(--color-accent)] hover:underline"
                   >
-                    {article.author.name}
+                    {safe.author.name}
                   </Link>
-                  <span className="text-xs">{article.author.role}</span>
+                  <span className="text-xs">{safe.author.role}</span>
                 </div>
               </div>
               <span aria-hidden="true">&middot;</span>
               <span className="flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M208,32H192V24a8,8,0,0,0-16,0v8H80V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM48,48H64v8a8,8,0,0,0,16,0V48h96v8a8,8,0,0,0,16,0V48h16V80H48V208ZM208,208H48V96H208V208Z"/></svg>
-                <RelativeTime date={article.publishedAt} />
-                {isLive(article.publishedAt) && <LiveBadge />}
+                <RelativeTime date={safe.publishedAt} />
+                {isLive(safe.publishedAt) && <LiveBadge />}
               </span>
               <span aria-hidden="true">&middot;</span>
               <span className="flex items-center gap-1.5">
                 <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm8-136V128a8,8,0,0,1-4.68,7.23l-40,20A8,8,0,0,1,80,148a8,8,0,0,1-3.23-15.32L112,115.06V80a8,8,0,0,1,16,0Z"/></svg>
-                {article.readTime} min read
+                {safe.readTime} min read
               </span>
             </div>
 
             {/* Bookmark & Share */}
             <div className="mt-4 flex items-center gap-1 border-t border-[var(--color-border)] pt-4">
-              <BookmarkButton slug={article.slug} title={article.title} />
+              <BookmarkButton slug={safe.slug} title={safe.title} />
               <span className="text-[var(--color-border)]">|</span>
               <ShareTools
-                url={`${SITE_URL}/${article.category.slug}/${article.slug}`}
-                title={article.title}
+                url={`${SITE_URL}/${safe.category.slug}/${safe.slug}`}
+                title={safe.title}
               />
             </div>
           </header>
@@ -302,8 +314,8 @@ export default async function ArticlePage({ params }: Props) {
           {/* Featured Image */}
           <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-lg">
             <Image
-              src={article.featuredImage.url}
-              alt={article.featuredImage.alt}
+              src={safe.featuredImage.url}
+              alt={safe.featuredImage.alt}
               fill
               sizes="(max-width: 768px) 100vw, 768px"
               className="object-cover"
@@ -314,19 +326,19 @@ export default async function ArticlePage({ params }: Props) {
           {/* Article Body */}
           <div
             className="article-body"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: safe.content }}
           />
 
           {/* Author Bio */}
           <div className="mt-12 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6">
-            <Link href={`/author/${article.author.slug}`} className="flex items-start gap-4 group">
+            <Link href={`/author/${safe.author.slug}`} className="flex items-start gap-4 group">
               <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
-                {article.author.avatar?.url ? (
+                {safe.author.avatar?.url ? (
                   <Image
-                    src={article.author.avatar.url}
-                    alt={article.author.name}
-                    width={article.author.avatar.width || 48}
-                    height={article.author.avatar.height || 48}
+                    src={safe.author.avatar.url}
+                    alt={safe.author.name}
+                    width={safe.author.avatar.width || 48}
+                    height={safe.author.avatar.height || 48}
                     className="h-12 w-12 rounded-full object-cover"
                     unoptimized
                   />
@@ -336,20 +348,20 @@ export default async function ArticlePage({ params }: Props) {
               </div>
               <div>
                 <p className="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] group-hover:underline">
-                  {article.author.name}
+                  {safe.author.name}
                 </p>
-                <p className="text-sm text-[var(--color-text-tertiary)]">{article.author.role}</p>
+                <p className="text-sm text-[var(--color-text-tertiary)]">{safe.author.role}</p>
                 <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                  {article.author.bio}
+                  {safe.author.bio}
                 </p>
               </div>
             </Link>
           </div>
 
           {/* Tags */}
-          {article.tags.length > 0 && (
+          {safe.tags.length > 0 && (
             <div className="mt-8 flex flex-wrap gap-2">
-              {article.tags.map((tag) => (
+              {safe.tags.map((tag) => (
                 <span
                   key={tag}
                   className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-secondary)]"
@@ -364,15 +376,15 @@ export default async function ArticlePage({ params }: Props) {
         {/* Sidebar */}
         <aside className="hidden lg:block">
           <div className="sticky top-24 space-y-8">
-            <CategorySidebar currentCategory={article.category.slug} />
-            <MostRead category={article.category.slug} excludeId={article.id} />
+            <CategorySidebar currentCategory={safe.category.slug} />
+            <MostRead category={safe.category.slug} excludeId={safe.id} />
           </div>
         </aside>
       </div>
       </article>
 
       {/* Related articles (full width, below main + sidebar grid) */}
-      <RelatedArticles category={article.category.slug} excludeId={article.id} />
+      <RelatedArticles category={safe.category.slug} excludeId={safe.id} />
     </>
   )
 }
