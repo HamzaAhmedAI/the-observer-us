@@ -22,6 +22,53 @@ import type { Metadata } from 'next'
 
 export const revalidate = 3600
 
+// ─── Defensive helpers for article data ─────────────────────────
+// These ensure the article object has all required nested fields
+// before it reaches JsonLd or metadata generation, preventing
+// "Cannot read properties of undefined" crashes during build.
+
+function ensureArticleMetadata(article: Awaited<ReturnType<typeof getArticleBySlug>>) {
+  if (!article) return null
+
+  // Ensure category has required fields
+  const category = article.category ?? { slug: 'politics', name: 'Politics' }
+  const categorySlug = category.slug ?? 'politics'
+  const categoryName = category.name ?? 'Politics'
+
+  // Ensure author has required fields
+  const author = article.author ?? { name: 'Hamza Ahmed', slug: 'hamza-ahmed', avatar: null, role: 'Founder & Editor-in-Chief', bio: 'Founder and Editor-in-Chief of The Observer US.' }
+  const authorName = author.name ?? 'Hamza Ahmed'
+  const authorSlug = author.slug ?? 'hamza-ahmed'
+
+  // Ensure featuredImage has all required fields for JsonLd
+  const featuredImage = article.featuredImage ?? {
+    url: 'https://picsum.photos/seed/placeholder/1200/675',
+    width: 1200,
+    height: 675,
+    alt: article.title ?? 'Article image',
+  }
+  const imageUrl = featuredImage.url
+  const imageWidth = featuredImage.width ?? 1200
+  const imageHeight = featuredImage.height ?? 675
+
+  // Ensure SEO object exists
+  const seo = article.seo ?? { title: article.title ?? 'Article', description: article.excerpt ?? '' }
+
+  // Ensure dates exist
+  const publishedAt = article.publishedAt ?? new Date().toISOString()
+  const updatedAt = article.updatedAt ?? new Date().toISOString()
+
+  return {
+    ...article,
+    category: { slug: categorySlug, name: categoryName },
+    author: { name: authorName, slug: authorSlug, avatar: author.avatar ?? null, role: author.role ?? 'Contributor', bio: author.bio ?? '' },
+    featuredImage: { url: imageUrl, width: imageWidth, height: imageHeight, alt: featuredImage.alt },
+    seo,
+    publishedAt,
+    updatedAt,
+  }
+}
+
 export async function generateStaticParams() {
   const articles = await getArticles({ limit: 1000 }) // Fetch all published articles
   return articles.data.map(article => ({
