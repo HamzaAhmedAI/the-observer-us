@@ -4,7 +4,7 @@ This app now runs as a **standard Next.js + Payload** server on the Oracle
 Always Free VM. No Vercel, no Cloudflare Workers. Only cost = the domain.
 
 ## Stack
-- **App:** Next.js 16 + Payload 3.87 (`next start`, port 3000)
+- **App:** Next.js 16 + Payload 3.87 (`next start`, port 3001)
 - **DB:** Neon free Postgres (real content) — via `DATABASE_URL`
 - **Media:** local disk (`staticDir`) served at `/media/*`
 - **Reverse proxy / HTTPS:** Caddy (automatic Let's Encrypt) OR Cloudflare Tunnel
@@ -17,7 +17,7 @@ Always Free VM. No Vercel, no Cloudflare Workers. Only cost = the domain.
 
 ## Files in this folder
 - `the-observer.service`       — systemd unit, runs `next start`
-- `Caddyfile`                  — local HTTPS + proxy to :3000
+- `Caddyfile`                  — local HTTPS + proxy to :3001
 - `cloudflared.service`        — Cloudflare Tunnel (no open ports, free SSL)
 - `../../.env.example`         — copy to `/opt/observer/.env` (fill in real values; never commit them)
 - `deploy.sh`                  — one-shot install (idempotent-ish)
