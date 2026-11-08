@@ -27,4 +27,12 @@ export const DEFAULT_METADATA: Metadata = {
     'max-image-preview': 'large',
     'max-snippet': -1,
   },
+  alternates: {
+    canonical: '/',
+    types: {
+      'application/rss+xml': [
+        { url: `${SITE_URL}/rss.xml`, title: `${SITE_NAME} — RSS Feed` },
+      ],
+    },
+  },
 }

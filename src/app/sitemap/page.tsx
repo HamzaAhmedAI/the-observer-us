@@ -4,10 +4,11 @@
    (the raw XML sitemap remains at /news-sitemap.xml).
    ============================================================ */
 
+import Image from 'next/image'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getArticles } from '@/lib/cms'
-import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/seo'
+import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: `Sitemap — ${SITE_NAME}`,
@@ -27,7 +28,7 @@ export default async function SitemapPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-12">
       <header className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
-        <img
+        <Image
           src="/logo.png"
           alt={`${SITE_NAME} logo`}
           width={56}

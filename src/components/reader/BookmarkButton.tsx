@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Bookmark, BookmarkSimple } from '@phosphor-icons/react'
 import { logger } from '@/lib/logger'
 
@@ -13,19 +13,20 @@ interface BookmarkButtonProps {
 const STORAGE_KEY = 'Observer-bookmarks'
 
 export function BookmarkButton({ slug, title, className = '' }: BookmarkButtonProps) {
-  const [isBookmarked, setIsBookmarked] = useState(false)
-
-  useEffect(() => {
+  const [isBookmarked, setIsBookmarked] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const bookmarks = JSON.parse(stored) as Record<string, string>
-        setIsBookmarked(!!bookmarks[slug])
+        return !!bookmarks[slug]
       }
     } catch (err) {
       logger.warn('[BookmarkButton] localStorage read failed:', { err })
     }
-  }, [slug])
+    return false
+  })
+
+  // Initial bookmark state loaded via lazy initializer to avoid setState in effect
 
   const toggleBookmark = useCallback(() => {
     try {

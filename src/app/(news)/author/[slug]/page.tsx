@@ -16,13 +16,20 @@ import { SITE_NAME, SITE_URL } from '@/lib/seo'
 export const revalidate = 600
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug } = params
+
+  // ─── Defense-in-depth URL parameter validation ────────────────────
+  const VALID_SLUG = /^[a-z0-9][a-z0-9-]*$/
+  if (!VALID_SLUG.test(slug) || slug.includes('..') || slug.includes('<') || slug.includes('>')) {
+    return { title: 'Author Not Found', robots: 'noindex, nofollow' }
+  }
+
   const author = await getAuthorBySlug(slug)
-  if (!author) return { title: 'Author Not Found' }
+  if (!author) return { title: 'Author Not Found', robots: 'noindex, nofollow' }
 
   const title = `${author.name} — ${author.role || 'Author'} | ${SITE_NAME}`
   const description =
@@ -60,7 +67,8 @@ function SocialLink({ href, label }: { href: string; label: string }) {
 }
 
 export default async function AuthorPage({ params }: Props) {
-  const { slug } = await params
+  const { slug } = params
+
   const [author, articles] = await Promise.all([
     getAuthorBySlug(slug),
     getArticlesByAuthor(slug, 50),

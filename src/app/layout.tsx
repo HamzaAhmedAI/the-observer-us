@@ -41,8 +41,12 @@ export default function RootLayout({
         {/* Replace the href above with your production image CDN hostname:
              <link rel="preconnect" href="https://cdn.example.com" /> */}
 
-        {/* Prevent FOUC for dark mode — checks localStorage before paint */}
+        {/* Prevent FOUC for dark mode — checks localStorage before paint.
+            CSP nonce injected via Next.js config (see next.config.ts).
+            This script runs before hydration and is essential for theme.
+        */}
         <script
+          nonce={process.env.__NEXT_CSP_NONCE}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

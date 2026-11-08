@@ -3,7 +3,6 @@
    RSC: pulls latest isBreaking article. Sticky top, dismissable per session.
    ============================================================ */
 
-import Link from 'next/link'
 import { getBreakingArticles } from '@/lib/cms'
 import { BreakingBannerClient } from './BreakingBannerClient'
 
