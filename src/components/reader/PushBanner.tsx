@@ -5,44 +5,48 @@
 
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback, useSyncExternalStore } from 'react'
 import { Bell, X, BellSlash } from '@phosphor-icons/react'
 import { logger } from '@/lib/logger'
 
 type PermissionState = 'idle' | 'loading' | 'granted' | 'denied' | 'error' | 'dismissed'
 
+// Hydration-safe read of the stored permission: 'idle' on the server,
+// the stored value on the client. No setState inside an effect.
+function getPermissionSnapshot(): PermissionState {
+  try {
+    if (localStorage.getItem('push-banner-dismissed') === 'true') return 'dismissed'
+  } catch (err) {
+    logger.warn('[PushBanner] localStorage read failed:', { err })
+  }
+  if (typeof window !== 'undefined' && 'Notification' in window) {
+    const perm = Notification.permission
+    if (perm === 'granted') return 'granted'
+    if (perm === 'denied') return 'denied'
+  }
+  return 'idle'
+}
+
 export function PushBanner() {
-  const [permission, setPermission] = useState<PermissionState>('idle')
+  const storedPermission = useSyncExternalStore(
+    () => () => {},
+    getPermissionSnapshot,
+    () => 'idle' as PermissionState,
+  )
+  // Local override for changes made in this session (subscribe / dismiss).
+  const [permissionOverride, setPermissionOverride] = useState<PermissionState | null>(null)
+  const permission = permissionOverride ?? storedPermission
   const [errorMsg, setErrorMsg] = useState('')
 
-  // On mount, check if already dismissed or already granted
-  useEffect(() => {
-    const dismissed = localStorage.getItem('push-banner-dismissed')
-    if (dismissed === 'true') {
-      setPermission('dismissed')
-      return
-    }
-
-    if ('Notification' in window) {
-      const perm = Notification.permission
-      if (perm === 'granted') {
-        setPermission('granted')
-      } else if (perm === 'denied') {
-        setPermission('denied')
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const handleSubscribe = useCallback(async () => {
-    setPermission('loading')
+    setPermissionOverride('loading')
     setErrorMsg('')
 
     try {
       // 1. Request notification permission
       const permResult = await Notification.requestPermission()
       if (permResult !== 'granted') {
-        setPermission('denied')
+        setPermissionOverride('denied')
         return
       }
 
@@ -60,7 +64,7 @@ export function PushBanner() {
 
       if (!vapidPublicKey) {
         logger.warn('[PushBanner] VAPID public key not configured — skipping push subscription')
-        setPermission('granted')
+        setPermissionOverride('granted')
         return
       }
 
@@ -86,18 +90,18 @@ export function PushBanner() {
         throw new Error('Failed to register push subscription on server')
       }
 
-      setPermission('granted')
+      setPermissionOverride('granted')
     } catch (error) {
       logger.error('[PushBanner] Subscription failed:', { error })
       setErrorMsg(
         error instanceof Error ? error.message : 'Could not enable notifications'
       )
-      setPermission('error')
+      setPermissionOverride('error')
     }
   }, [])
 
   const handleDismiss = useCallback(() => {
-    setPermission('dismissed')
+    setPermissionOverride('dismissed')
     localStorage.setItem('push-banner-dismissed', 'true')
   }, [])
 

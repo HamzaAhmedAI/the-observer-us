@@ -8,7 +8,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useSyncExternalStore } from 'react'
 import { List, X, Moon, Sun } from '@phosphor-icons/react'
 import { logger } from '@/lib/logger'
 import { NAV_CATEGORIES } from '@/lib/nav'
@@ -19,23 +19,30 @@ const NAV_LINKS = NAV_CATEGORIES.map(({ label, href }) => ({ label, href }))
 const MENU_ID = 'obv-menu-toggle'
 
 export function Header() {
-  const [isDark, setIsDark] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const menuCheckboxRef = useRef<HTMLInputElement | null>(null)
-
-  useEffect(() => {
-    setMounted(true)
+  // Read the stored theme lazily — no setState inside an effect.
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false
     try {
       const stored = localStorage.getItem('theme')
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      const dark = stored === 'dark' || (!stored && prefersDark)
-      setIsDark(dark)
-      document.documentElement.classList.toggle('dark', dark)
+      return stored === 'dark' || (!stored && prefersDark)
     } catch (err) {
       logger.warn('[Header] Failed to read theme:', { err })
+      return false
     }
-  }, [])
+  })
+  const [menuOpen, setMenuOpen] = useState(false)
+  // Hydration-safe "mounted" flag: false on the server, true on the client.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
+  const menuCheckboxRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+  }, [isDark])
 
   /* Sync React state with checkbox for icon swap */
   useEffect(() => {

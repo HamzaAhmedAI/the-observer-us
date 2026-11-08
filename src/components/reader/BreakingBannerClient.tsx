@@ -7,7 +7,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useCallback, useSyncExternalStore } from 'react'
 import { logger } from '@/lib/logger'
 
 interface BreakingBannerClientProps {
@@ -17,21 +17,28 @@ interface BreakingBannerClientProps {
 
 const DISMISS_KEY = 'breaking-dismissed'
 
-export function BreakingBannerClient({ href, label }: BreakingBannerClientProps) {
-  const [dismissed, setDismissed] = useState(false)
-  const [mounted, setMounted] = useState(false)
+// Hydration-safe read of the stored dismissal: false on the server,
+// the stored value on the client. No setState inside an effect.
+function getDismissedSnapshot(): boolean {
+  try {
+    return typeof window !== 'undefined' && sessionStorage.getItem(DISMISS_KEY) === '1'
+  } catch (err: unknown) {
+    logger.warn('[BreakingBanner] sessionStorage read failed:', { err })
+    return false
+  }
+}
 
-  useEffect(() => {
-    setMounted(true)
-    try {
-      if (sessionStorage.getItem(DISMISS_KEY) === '1') setDismissed(true)
-    } catch (err: unknown) {
-      logger.warn('[BreakingBanner] sessionStorage read failed:', { err })
-    }
-  }, [])
+export function BreakingBannerClient({ href, label }: BreakingBannerClientProps) {
+  const dismissedStored = useSyncExternalStore(
+    () => () => {},
+    getDismissedSnapshot,
+    () => false,
+  )
+  const [dismissedLocal, setDismissedLocal] = useState(false)
+  const dismissed = dismissedStored || dismissedLocal
 
   const dismiss = useCallback(() => {
-    setDismissed(true)
+    setDismissedLocal(true)
     try {
       sessionStorage.setItem(DISMISS_KEY, '1')
     } catch (err: unknown) {
@@ -39,7 +46,7 @@ export function BreakingBannerClient({ href, label }: BreakingBannerClientProps)
     }
   }, [])
 
-  if (!mounted || dismissed) return null
+  if (dismissed) return null
 
   return (
     <div

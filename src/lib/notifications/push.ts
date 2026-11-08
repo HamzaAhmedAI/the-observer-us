@@ -24,9 +24,8 @@ async function ensureWebPush() {
 
   try {
     // Dynamic import — web-push is Node-only
-    const module = await import('web-push')
-    webpush = module
-    webpush.setVapidDetails(
+    webpush = await import('web-push')
+    webpush!.setVapidDetails(
       'mailto:push@theObserver.com',
       publicKey,
       privateKey

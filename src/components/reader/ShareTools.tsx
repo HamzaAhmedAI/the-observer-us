@@ -43,17 +43,6 @@ export function ShareTools({ url, title, className = '' }: ShareToolsProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const copyToClipboard = useCallback(async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    } catch {
-      setShareError('Could not access clipboard. Try selecting and copying the URL manually.')
-      setTimeout(() => setShareError(null), 4000)
-    }
-  }, [])
-
   const handleShare = useCallback(async () => {
     setShareError(null)
     setMenuOpen(false)
