@@ -5,7 +5,7 @@ set -euo pipefail
 
 APP_DIR="/opt/observer/the-observer-us"
 REPO="https://github.com/HamzaAhmedAI/the-observer-us.git"
-BRANCH="deploy-oracle"
+BRANCH="main"
 ENV_FILE="/opt/observer/.env"
 
 echo "==> Deploying The Observer US to $APP_DIR"

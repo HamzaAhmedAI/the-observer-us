@@ -2,6 +2,13 @@
 // Article Types — Core data shapes for the entire platform
 // ============================================================
 
+export type ArticleContentType = 'evergreen-hub' | 'news-hook' | 'tool-guide'
+
+export interface ArticleSource {
+  label: string
+  url: string
+}
+
 export interface Article {
   id: string
   slug: string
@@ -18,6 +25,11 @@ export interface Article {
   isFeatured: boolean
   readTime: number // in minutes
   viewCount?: number
+  // Home & Wallet Protection format — optional so older articles still render.
+  contentType?: ArticleContentType
+  sources?: ArticleSource[]
+  lastReviewed?: string | null
+  containsAffiliateLinks?: boolean
   seo: SEO
 }
 

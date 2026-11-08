@@ -116,6 +116,68 @@ export const Articles: CollectionConfig = {
       ],
     },
     {
+      name: 'contentType',
+      type: 'select',
+      label: 'Content Type',
+      defaultValue: 'news-hook',
+      options: [
+        { label: 'Evergreen hub — action guide, updated over time', value: 'evergreen-hub' },
+        { label: 'News hook — one event, links into a hub', value: 'news-hook' },
+        { label: 'Tool / comparison guide — quote, checklist or calculator page', value: 'tool-guide' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Home & Wallet mix: 40% evergreen hubs, 40% news hooks, 20% tool guides.',
+      },
+    },
+    {
+      name: 'sources',
+      type: 'array',
+      label: 'Sources (official, linked)',
+      maxRows: 8,
+      fields: [
+        {
+          name: 'label',
+          type: 'text',
+          label: 'Source name',
+          required: true,
+          admin: { description: 'e.g. "FTC — Get a credit freeze"' },
+        },
+        {
+          name: 'url',
+          type: 'text',
+          label: 'Source URL',
+          required: true,
+        },
+      ],
+      admin: {
+        description:
+          'Every factual claim should trace to one of these. Link the official source, never a rewrite of it.',
+      },
+    },
+    {
+      name: 'lastReviewed',
+      type: 'date',
+      label: 'Last Reviewed',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Date this guide was last checked against its official sources. Shown on evergreen hubs.',
+      },
+    },
+    {
+      name: 'containsAffiliateLinks',
+      type: 'checkbox',
+      label: 'Contains affiliate links',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Tick this if any link on the page is an affiliate link — a disclosure line is shown to readers.',
+      },
+    },
+    {
       name: 'publishedAt',
       type: 'date',
       label: 'Published At',

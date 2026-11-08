@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=opc
 # Creates a tunnel named "observer" (run `cloudflared tunnel login` once first).
-# Ingress: https://theobserverus.com -> http://localhost:3000
+# Ingress: https://theobserverus.com -> http://localhost:3001
 ExecStart=/usr/bin/cloudflared tunnel --config /opt/observer/cloudflared.yml run observer
 Restart=on-failure
 RestartSec=5

@@ -11,17 +11,9 @@ import Link from 'next/link'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { List, X, Moon, Sun } from '@phosphor-icons/react'
 import { logger } from '@/lib/logger'
+import { NAV_CATEGORIES } from '@/lib/nav'
 
-const NAV_LINKS = [
-  { label: 'Politics', href: '/politics' },
-  { label: 'Technology', href: '/technology' },
-  { label: 'Business', href: '/business' },
-  { label: 'Sports', href: '/sports' },
-  { label: 'Entertainment', href: '/entertainment' },
-  { label: 'Health', href: '/health' },
-  { label: 'Science', href: '/science' },
-  { label: 'World', href: '/world' },
-]
+const NAV_LINKS = NAV_CATEGORIES.map(({ label, href }) => ({ label, href }))
 
 /* Shared ID for the mobile-menu checkbox — unique enough since Header is a singleton */
 const MENU_ID = 'obv-menu-toggle'

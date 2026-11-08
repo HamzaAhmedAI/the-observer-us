@@ -9,12 +9,17 @@ Always Free VM. No Vercel, no Cloudflare Workers. Only cost = the domain.
 - **Media:** local disk (`staticDir`) served at `/media/*`
 - **Reverse proxy / HTTPS:** Caddy (automatic Let's Encrypt) OR Cloudflare Tunnel
 - **Front:** Cloudflare DNS (orange-cloud) → CDN/WAF (free)
+- **Deploy branch:** `main` — `deploy.sh` pulls `main`. The old `deploy-oracle`
+  branch was merged into `main` (Nov 2026) and must not be used for deploys.
+- **Ingress (live):** Cloudflare Tunnel → `http://localhost:3001`.
+  Caddy is the alternative ingress; if used, it must also proxy to **:3001**
+  (the port in `the-observer.service`), not :3000.
 
 ## Files in this folder
 - `the-observer.service`       — systemd unit, runs `next start`
 - `Caddyfile`                  — local HTTPS + proxy to :3000
 - `cloudflared.service`        — Cloudflare Tunnel (no open ports, free SSL)
-- `env.production.example`     — copy to `/opt/observer/.env`
+- `../../.env.example`         — copy to `/opt/observer/.env` (fill in real values; never commit them)
 - `deploy.sh`                  — one-shot install (idempotent-ish)
 
 ## Prereqs on the VM

@@ -53,7 +53,7 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Category preferences</strong> — the
-            topics you choose to follow (e.g., politics, technology).
+            topics you choose to follow (e.g., home costs, recalls).
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Push subscription data</strong> — if

@@ -7,7 +7,7 @@
 import Link from 'next/link'
 
 interface PaginationProps {
-  /** Base path for page links, e.g. `/politics` */
+  /** Base path for page links, e.g. `/home-costs` */
   basePath: string
   /** Current active page (1-indexed) */
   currentPage: number

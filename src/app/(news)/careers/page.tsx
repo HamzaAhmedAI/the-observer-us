@@ -41,7 +41,7 @@ export default function CareersPage() {
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Writers &amp; Reporters</strong> —
-            cover US politics, technology, business, and more.
+            cover US home costs, bills and insurance, recalls, scams, and breaches.
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Engineering</strong> — build and

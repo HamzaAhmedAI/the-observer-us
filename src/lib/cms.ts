@@ -10,6 +10,7 @@
 import type { Article, Author, Category, Media, PaginatedResponse } from '@/types/article'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { NAV_CATEGORIES } from '@/lib/nav'
 
 // Payload 3.87.1's REST query-string `where` parser is broken for several
 // field paths (e.g. `where[slug]`, `where[isFeatured]`, `where[category.slug]`
@@ -26,8 +27,18 @@ async function getP(): Promise<P> {
 const CMS_API_URL = process.env.CMS_API_URL ?? ''
 
 // ─── Cache Helpers ───────────────────────────────────────────
-// When no CMS is configured, return mock data for development
+// When no CMS is configured, return mock data for development.
+// Mock data is NEVER served in production: a missing CMS in production
+// must show an empty site (loudly, in the logs) — never fake articles
+// under invented bylines.
 const USE_MOCK = !CMS_API_URL
+
+if (USE_MOCK && process.env.NODE_ENV === 'production') {
+  console.error(
+    '[CMS] CMS_API_URL is not set in production — mock articles are DISABLED. ' +
+      'Configure the CMS (DATABASE_URL / CMS_API_URL) or the site will render empty.'
+  )
+}
 
 // ─── Normalization Helpers ───────────────────────────────────
 
@@ -91,8 +102,8 @@ function normalizeCategory(c: Category | null | undefined): Category {
   if (!c || !c.slug || !c.name) {
     return {
       id: 'fallback-category',
-      slug: 'politics',
-      name: 'Politics',
+      slug: 'home-costs',
+      name: 'Home Costs',
       description: '',
       color: '#2563eb',
       articleCount: 0,
@@ -141,6 +152,11 @@ function normalizeArticle<T extends Article>(a: T): T | null {
   // Ensure boolean fields have defaults
   if (typeof a.isBreaking !== 'boolean') a.isBreaking = false
   if (typeof a.isFeatured !== 'boolean') a.isFeatured = false
+
+  // Home & Wallet fields — defaults so older articles still render
+  if (!a.contentType) a.contentType = 'news-hook'
+  if (!Array.isArray(a.sources)) a.sources = []
+  if (typeof a.containsAffiliateLinks !== 'boolean') a.containsAffiliateLinks = false
 
   // Ensure numeric fields have defaults
   if (typeof a.readTime !== 'number') a.readTime = 5
@@ -386,37 +402,36 @@ export async function getArticlesByAuthor(
 }
 
 // ─── Mock Data for Development ───────────────────────────────
+const MOCK_CATEGORY_COLORS: Record<string, string> = {
+  'home-costs': '#2563eb',
+  'bills-insurance': '#0891b2',
+  recalls: '#dc2626',
+  'home-scams': '#ea580c',
+  'breach-actions': '#7c3aed',
+}
+
 function getMockCategories(): Category[] {
-  return [
-    { id: '1', slug: 'politics', name: 'Politics', description: '', color: '#2563eb', articleCount: 12 },
-    { id: '2', slug: 'technology', name: 'Technology', description: '', color: '#059669', articleCount: 8 },
-    { id: '3', slug: 'business', name: 'Business', description: '', color: '#0891b2', articleCount: 6 },
-    { id: '4', slug: 'sports', name: 'Sports', description: '', color: '#ea580c', articleCount: 10 },
-    { id: '5', slug: 'entertainment', name: 'Entertainment', description: '', color: '#8b5cf6', articleCount: 7 },
-    { id: '6', slug: 'health', name: 'Health', description: '', color: '#e11d48', articleCount: 5 },
-    { id: '7', slug: 'science', name: 'Science', description: '', color: '#65a30d', articleCount: 4 },
-    { id: '8', slug: 'world', name: 'World', description: '', color: '#4f46e5', articleCount: 9 },
-  ]
+  return NAV_CATEGORIES.map((cat, i) => ({
+    id: String(i + 1),
+    slug: cat.slug,
+    name: cat.label,
+    description: cat.description,
+    color: MOCK_CATEGORY_COLORS[cat.slug] ?? '#2563eb',
+    articleCount: 0,
+  }))
 }
 
 const MOCK_AUTHORS = [
-  { id: 'a1', slug: 'sarah-chen', name: 'Sarah Chen', avatar: { url: '/images/author-1.jpg', width: 100, height: 100, alt: 'Sarah Chen' }, bio: 'Senior political correspondent.', role: 'Senior Correspondent' },
-  { id: 'a2', slug: 'marcus-williams', name: 'Marcus Williams', avatar: { url: '/images/author-2.jpg', width: 100, height: 100, alt: 'Marcus Williams' }, bio: 'Technology editor covering AI and startups.', role: 'Tech Editor' },
-  { id: 'a3', slug: 'elena-rodriguez', name: 'Elena Rodriguez', avatar: { url: '/images/author-3.jpg', width: 100, height: 100, alt: 'Elena Rodriguez' }, bio: 'Global affairs correspondent.', role: 'World News Editor' },
   { id: 'hamza-ahmed', slug: 'hamza-ahmed', name: 'Hamza Ahmed', avatar: { url: '/media/hamza-ahmed.jpg', width: 1024, height: 1024, alt: 'Hamza Ahmed' }, bio: 'Founder and Editor-in-Chief of The Observer US.', role: 'Founder & Editor-in-Chief', linkedin: 'https://www.linkedin.com/in/hamza-ahmed', twitter: 'https://x.com/hamzaahmed', website: 'https://theobserverus.com' },
 ]
 
 const MOCK_HEADLINES = [
-  { title: 'Senate Passes Landmark Climate Bill in Historic Late-Night Session', category: 'politics', author: MOCK_AUTHORS[0] },
-  { title: 'Revolutionary AI Chip Promises 10x Performance Leap for Data Centers', category: 'technology', author: MOCK_AUTHORS[1] },
-  { title: 'Federal Reserve Signals Potential Rate Cut as Inflation Cools', category: 'business', author: MOCK_AUTHORS[0] },
-  { title: 'Underdog Team Secures Championship Victory in Overtime Thriller', category: 'sports', author: MOCK_AUTHORS[2] },
-  { title: 'Streaming Wars Heat Up as New Platform Announces Original Slate', category: 'entertainment', author: MOCK_AUTHORS[1] },
-  { title: 'Breakthrough Gene Therapy Shows Promise in Clinical Trials', category: 'health', author: MOCK_AUTHORS[2] },
-  { title: 'NASA Confirms Water Molecules on Sunlit Surface of the Moon', category: 'science', author: MOCK_AUTHORS[2] },
-  { title: 'Global Summit Addresses Rising Tensions in Southeast Asia', category: 'world', author: MOCK_AUTHORS[0] },
-  { title: 'New Study Reveals Exercise Timing Affects Sleep Quality', category: 'health', author: MOCK_AUTHORS[1] },
-  { title: 'Electric Vehicle Sales Surge Past 40% Market Share for First Time', category: 'business', author: MOCK_AUTHORS[0] },
+  { title: 'How to Freeze Your Credit at All Three Bureaus (Free)', category: 'breach-actions', author: MOCK_AUTHORS[0] },
+  { title: 'Got a Breach Letter? Do These 4 Things Before the Deadline in Your Letter', category: 'breach-actions', author: MOCK_AUTHORS[0] },
+  { title: 'Home Insurance Up Again? How to Shop Your Renewal Before You Pay It', category: 'home-costs', author: MOCK_AUTHORS[0] },
+  { title: 'Check Your Model: The Household Recalls to Act On This Month', category: 'recalls', author: MOCK_AUTHORS[0] },
+  { title: 'The Utility-Imposter Call: How the Scam Works and What to Say', category: 'home-scams', author: MOCK_AUTHORS[0] },
+  { title: 'Your Bill Went Up. Here Is the Exact Script to Dispute It', category: 'bills-insurance', author: MOCK_AUTHORS[0] },
 ]
 
 function getMockArticles(options?: {
@@ -425,6 +440,10 @@ function getMockArticles(options?: {
   page?: number
   featured?: boolean
 }): PaginatedResponse<Article> {
+  // Production never serves mock articles — see the USE_MOCK warning above.
+  if (process.env.NODE_ENV === 'production') {
+    return { data: [], total: 0, page: options?.page ?? 1, pageSize: options?.limit ?? 10, hasMore: false }
+  }
   let articles = MOCK_HEADLINES.map((h, i) => ({
     id: String(i + 1),
     slug: h.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),

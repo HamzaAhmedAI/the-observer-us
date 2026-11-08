@@ -49,7 +49,7 @@ export default async function HomePage() {
   return (
     <div className="container-news py-8 md:py-12">
       {/* Site title — visually hidden, establishes the h1 for screen readers */}
-      <h1 className="sr-only">The Observer US — breaking news, in-depth analysis, and stories that matter</h1>
+      <h1 className="sr-only">The Observer US — Protect your home. Protect your wallet.</h1>
 
       {/* Featured Hero */}
       {featuredArticle ? (
@@ -66,7 +66,7 @@ export default async function HomePage() {
               Latest Stories
             </h2>
             <p className="mt-1 text-sm text-[var(--color-text-tertiary)]">
-              Top stories from across our coverage
+              Home costs, bills, recalls, scams and breaches — with the action step, every time
             </p>
           </div>
         </div>
@@ -150,8 +150,9 @@ export default async function HomePage() {
             Stay Informed
           </h2>
           <p className="mb-7 text-sm text-[var(--color-text-secondary)]">
-            Get the latest breaking news, in-depth analysis, and exclusive stories delivered
-            straight to your inbox. Free, always.
+            Get the home and wallet alerts that matter — recalls, price hikes, scams and
+            breaches — with the steps to protect yourself, delivered straight to your inbox.
+            Free, always.
           </p>
           <EmailSubscribe />
         </div>

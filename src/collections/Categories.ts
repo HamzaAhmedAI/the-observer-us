@@ -1,5 +1,6 @@
 /* ============================================================
-   Categories — News sections (politics, tech, business, ...)
+   Categories — Home & Wallet Protection sections
+   (home-costs, bills-insurance, recalls, home-scams, breach-actions)
    ============================================================ */
 
 import type { CollectionConfig } from 'payload'
@@ -29,7 +30,7 @@ export const Categories: CollectionConfig = {
       unique: true,
       index: true,
       admin: {
-        description: 'URL segment, e.g. "technology" → /technology',
+        description: 'URL segment, e.g. "home-costs" → /home-costs',
       },
     },
     {

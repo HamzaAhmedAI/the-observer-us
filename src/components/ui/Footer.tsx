@@ -6,17 +6,9 @@
 
 import Link from 'next/link'
 import { FooterCopyright, FooterNewsletterLink } from './FooterIcons'
+import { NAV_CATEGORIES, SITE_TAGLINE } from '@/lib/nav'
 
-const FOOTER_CATEGORIES = [
-  { label: 'Politics', href: '/politics' },
-  { label: 'Technology', href: '/technology' },
-  { label: 'Business', href: '/business' },
-  { label: 'Sports', href: '/sports' },
-  { label: 'Entertainment', href: '/entertainment' },
-  { label: 'Health', href: '/health' },
-  { label: 'Science', href: '/science' },
-  { label: 'World', href: '/world' },
-]
+const FOOTER_CATEGORIES = NAV_CATEGORIES.map(({ label, href }) => ({ label, href }))
 
 const FOOTER_LINKS = [
   { label: 'About Us', href: '/about' },
@@ -43,7 +35,7 @@ export function Footer() {
               <span className="text-xs font-medium text-[var(--color-text-tertiary)]">US</span>
             </Link>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--color-text-secondary)]">
-              Your trusted source for breaking news, in-depth analysis, and stories that matter.
+              {SITE_TAGLINE} Practical US guides and news on home costs, bills, recalls, scams, and data breaches.
             </p>
           </div>
 

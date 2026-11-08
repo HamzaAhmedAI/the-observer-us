@@ -27,7 +27,8 @@ export default function AdvertisePage() {
         <LegalList>
           <li>
             <strong className="text-[var(--color-text-primary)]">Engaged readers.</strong> Visitors
-            come for breaking news and analysis across politics, technology, business, and more.
+            come for practical home and wallet protection — home costs, bills and
+            insurance, recalls, scams, and breach actions.
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Brand-safe environment.</strong> A

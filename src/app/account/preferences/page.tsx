@@ -8,17 +8,21 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Bell, Envelope, Check, X, ArrowLeft } from '@phosphor-icons/react'
 import Link from 'next/link'
+import { NAV_CATEGORIES } from '@/lib/nav'
 
-const CATEGORIES = [
-  { slug: 'politics', name: 'Politics', color: '#2563eb' },
-  { slug: 'technology', name: 'Technology', color: '#059669' },
-  { slug: 'business', name: 'Business', color: '#0891b2' },
-  { slug: 'sports', name: 'Sports', color: '#ea580c' },
-  { slug: 'entertainment', name: 'Entertainment', color: '#8b5cf6' },
-  { slug: 'health', name: 'Health', color: '#e11d48' },
-  { slug: 'science', name: 'Science', color: '#65a30d' },
-  { slug: 'world', name: 'World', color: '#4f46e5' },
-]
+const CATEGORY_COLORS: Record<string, string> = {
+  'home-costs': '#2563eb',
+  'bills-insurance': '#0891b2',
+  recalls: '#dc2626',
+  'home-scams': '#ea580c',
+  'breach-actions': '#7c3aed',
+}
+
+const CATEGORIES = NAV_CATEGORIES.map((cat) => ({
+  slug: cat.slug,
+  name: cat.label,
+  color: CATEGORY_COLORS[cat.slug] ?? '#2563eb',
+}))
 
 type PageState = 'email-input' | 'loading' | 'subscribed' | 'error'
 

@@ -5,12 +5,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { LegalPage, LegalSection } from '@/components/reader/LegalPage'
+import { NAV_CATEGORIES } from '@/lib/nav'
 import { SITE_NAME } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: `About Us — ${SITE_NAME}`,
   description:
-    'The Observer US is an independent, AI-assisted newsroom delivering breaking news and analysis across US politics, technology, business, and more.',
+    'The Observer US is an independent, AI-assisted newsroom covering Home & Wallet Protection: US home costs, bills and insurance, household recalls, home scams, and data breaches — what happened, who is affected, and what to do next.',
   alternates: { canonical: '/about' },
   robots: { index: true, follow: true },
 }
@@ -21,14 +22,15 @@ export default function AboutPage() {
   return (
     <LegalPage
       title="About Us"
-      intro="The Observer US is an independent digital news publication built for readers who want fast, accurate, and clearly-sourced coverage of the stories shaping the United States and the world."
+      intro="The Observer US is an independent digital news publication built for US homeowners and households who want practical, clearly-sourced protection for their home and their wallet — not general news noise."
       lastUpdated="August 21, 2026"
     >
       <LegalSection title="Our Mission">
         <p>
-          We exist to make trustworthy news free and accessible to everyone. Our mission is to
-          deliver breaking stories and in-depth analysis with speed, clarity, and editorial
-          accountability — without paywalls blocking the public from information that matters.
+          We exist to help US households protect what they own and what they earn. Our mission
+          is to turn home costs, bills, recalls, scams, and breaches into clear action: what
+          happened, who is affected, and what to do next — with the official source linked,
+          every time. No paywalls blocking the public from information that protects them.
         </p>
       </LegalSection>
 
@@ -53,51 +55,22 @@ export default function AboutPage() {
       </LegalSection>
 
       <LegalSection title="What We Cover">
-        <p>We publish across the categories readers care about most:</p>
+        <p>We cover one thing, properly — Home &amp; Wallet Protection:</p>
         <ul className="list-disc space-y-2 pl-6">
-          <li>
-            <Link href="/politics" className="text-[var(--color-accent)] hover:underline">
-              Politics
-            </Link>{' '}
-            — federal policy, elections, and government accountability.
-          </li>
-          <li>
-            <Link href="/technology" className="text-[var(--color-accent)] hover:underline">
-              Technology
-            </Link>{' '}
-            — AI, platforms, cybersecurity, and innovation.
-          </li>
-          <li>
-            <Link href="/business" className="text-[var(--color-accent)] hover:underline">
-              Business
-            </Link>{' '}
-            — markets, the economy, and industry.
-          </li>
-          <li>
-            <Link href="/world" className="text-[var(--color-accent)] hover:underline">
-              World
-            </Link>{' '}
-            — international affairs and global developments.
-          </li>
-          <li>
-            <Link href="/health" className="text-[var(--color-accent)] hover:underline">
-              Health
-            </Link>
-            ,{' '}
-            <Link href="/science" className="text-[var(--color-accent)] hover:underline">
-              Science
-            </Link>
-            ,{' '}
-            <Link href="/sports" className="text-[var(--color-accent)] hover:underline">
-              Sports
-            </Link>
-            , and{' '}
-            <Link href="/entertainment" className="text-[var(--color-accent)] hover:underline">
-              Entertainment
-            </Link>
-            .
-          </li>
+          {NAV_CATEGORIES.map((cat) => (
+            <li key={cat.slug}>
+              <Link href={cat.href} className="text-[var(--color-accent)] hover:underline">
+                {cat.label}
+              </Link>{' '}
+              — {cat.description}
+            </li>
+          ))}
         </ul>
+        <p>
+          We do not publish general politics, world, sports, or entertainment news. Every story
+          must answer a household question: does this cost me money, put my home at risk, or
+          require me to act — and by when?
+        </p>
       </LegalSection>
 
       <LegalSection title="Editorial Independence">

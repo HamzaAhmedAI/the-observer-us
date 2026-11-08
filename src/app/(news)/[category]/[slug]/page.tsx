@@ -22,6 +22,13 @@ import type { Metadata } from 'next'
 
 export const revalidate = 3600
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+})
+
 // ─── Defensive helpers for article data ─────────────────────────
 // These ensure the article object has all required nested fields
 // before it reaches JsonLd or metadata generation, preventing
@@ -31,9 +38,9 @@ function ensureArticleMetadata(article: Awaited<ReturnType<typeof getArticleBySl
   if (!article) return null
 
   // Ensure category has required fields
-  const category = article.category ?? { slug: 'politics', name: 'Politics' }
-  const categorySlug = category.slug ?? 'politics'
-  const categoryName = category.name ?? 'Politics'
+  const category = article.category ?? { slug: 'home-costs', name: 'Home Costs' }
+  const categorySlug = category.slug ?? 'home-costs'
+  const categoryName = category.name ?? 'Home Costs'
 
   // Ensure author has required fields
   const author = article.author ?? { name: 'Hamza Ahmed', slug: 'hamza-ahmed', avatar: null, role: 'Founder & Editor-in-Chief', bio: 'Founder and Editor-in-Chief of The Observer US.' }
@@ -328,6 +335,54 @@ export default async function ArticlePage({ params }: Props) {
             className="article-body"
             dangerouslySetInnerHTML={{ __html: safe.content }}
           />
+
+          {/* Home & Wallet trust block — sources, review date, affiliate disclosure */}
+          {(safe.sources?.length ? true : false) ||
+          safe.lastReviewed ||
+          safe.containsAffiliateLinks ? (
+            <section
+              aria-label="Sources and disclosures"
+              className="mt-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6"
+            >
+              {safe.contentType === 'evergreen-hub' && safe.lastReviewed && (
+                <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+                  <strong className="text-[var(--color-text-primary)]">Last reviewed:</strong>{' '}
+                  {dateFormatter.format(new Date(safe.lastReviewed))} against the official
+                  sources below. Steps change — if a bureau link has moved, use the official
+                  source, not a copy of it.
+                </p>
+              )}
+              {safe.sources && safe.sources.length > 0 && (
+                <div className="mb-4">
+                  <h2 className="mb-2 text-sm font-bold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                    Sources
+                  </h2>
+                  <ul className="space-y-1.5">
+                    {safe.sources.map((source) => (
+                      <li key={source.url} className="text-sm">
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-text-link)] hover:underline"
+                        >
+                          {source.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {safe.containsAffiliateLinks && (
+                <p className="text-xs leading-relaxed text-[var(--color-text-tertiary)]">
+                  Disclosure: this guide contains affiliate links. If you buy through them,
+                  The Observer US may earn a commission at no extra cost to you. It does not
+                  affect what we recommend — the free official action (such as a credit freeze)
+                  is always listed first.
+                </p>
+              )}
+            </section>
+          ) : null}
 
           {/* Author Bio */}
           <div className="mt-12 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6">

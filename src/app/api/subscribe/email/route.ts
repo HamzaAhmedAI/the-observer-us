@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     // Validate categories (whitelist approach - only known categories)
-    const KNOWN_CATEGORIES = ['politics', 'technology', 'business', 'sports', 'entertainment', 'health', 'science', 'world'] as const
+    const KNOWN_CATEGORIES = ['home-costs', 'bills-insurance', 'recalls', 'home-scams', 'breach-actions'] as const
     type KnownCategory = typeof KNOWN_CATEGORIES[number]
 
     const validCategories = Array.isArray(categories)
