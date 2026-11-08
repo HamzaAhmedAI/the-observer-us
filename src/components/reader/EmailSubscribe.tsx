@@ -8,17 +8,10 @@
 
 import { useState, type FormEvent } from 'react'
 import { PaperPlaneRight, CheckCircle, WarningCircle } from '@phosphor-icons/react'
+import { NAV_CATEGORIES } from '@/lib/nav'
 
-const CATEGORIES = [
-  'Politics',
-  'Technology',
-  'Business',
-  'Sports',
-  'Entertainment',
-  'Health',
-  'Science',
-  'World',
-]
+// Category slugs — must match the whitelist in /api/subscribe/email.
+const CATEGORIES = NAV_CATEGORIES
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
@@ -28,9 +21,9 @@ export function EmailSubscribe() {
   const [status, setStatus] = useState<Status>('idle')
   const [message, setMessage] = useState('')
 
-  const toggleCategory = (name: string) => {
+  const toggleCategory = (slug: string) => {
     setSelected((prev) =>
-      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
+      prev.includes(slug) ? prev.filter((c) => c !== slug) : [...prev, slug]
     )
   }
 
@@ -122,17 +115,17 @@ export function EmailSubscribe() {
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
-              key={cat}
+              key={cat.slug}
               type="button"
-              onClick={() => toggleCategory(cat)}
+              onClick={() => toggleCategory(cat.slug)}
               className={`rounded-full px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-all duration-[var(--duration-fast)]
                 ${
-                  selected.includes(cat)
+                  selected.includes(cat.slug)
                     ? 'bg-[var(--color-brand)] text-[var(--color-text-on-brand)] shadow-sm'
                     : 'border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]'
                 }`}
             >
-              {cat}
+              {cat.label}
             </button>
           ))}
         </div>
