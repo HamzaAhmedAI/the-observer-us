@@ -11,7 +11,7 @@ import { SITE_NAME } from '@/lib/seo'
 export const metadata: Metadata = {
   title: `About Us — ${SITE_NAME}`,
   description:
-    'The Observer US is an independent, AI-assisted newsroom covering Home & Wallet Protection: US home costs, bills and insurance, household recalls, home scams, and data breaches — what happened, who is affected, and what to do next.',
+    'The Observer US is an independent, AI-assisted newsroom covering Home & Wallet Protection: US home costs, bills and insurance, household recalls, home scams, data breaches, and off-grid preparedness — what happened, who is affected, and what to do next.',
   alternates: { canonical: '/about' },
   robots: { index: true, follow: true },
 }
@@ -28,9 +28,10 @@ export default function AboutPage() {
       <LegalSection title="Our Mission">
         <p>
           We exist to help US households protect what they own and what they earn. Our mission
-          is to turn home costs, bills, recalls, scams, and breaches into clear action: what
-          happened, who is affected, and what to do next — with the official source linked,
-          every time. No paywalls blocking the public from information that protects them.
+          is to turn home costs, bills, recalls, scams, breaches, and off-grid preparedness into
+          clear action: what happened, who is affected, and what to do next — with the official
+          source linked, every time. No paywalls blocking the public from information that
+          protects them.
         </p>
       </LegalSection>
 

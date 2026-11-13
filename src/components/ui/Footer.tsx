@@ -104,6 +104,16 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/tools"
+                  className="text-sm text-[var(--color-text-secondary)] no-underline
+                             transition-colors duration-[var(--duration-fast)]
+                             hover:text-[var(--color-text-primary)]"
+                >
+                  Tools &amp; Calculators
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/news-sitemap.xml"
                   className="text-sm text-[var(--color-text-secondary)] no-underline
                              transition-colors duration-[var(--duration-fast)]

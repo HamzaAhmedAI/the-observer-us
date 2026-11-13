@@ -51,4 +51,11 @@ export const NAV_CATEGORIES: NavCategory[] = [
     href: '/breach-actions',
     description: 'Data breaches that touch your household — and the exact steps to take.',
   },
+  {
+    label: 'Off-Grid Life',
+    slug: 'off-grid-life',
+    href: '/off-grid-life',
+    description:
+      'Household resilience when the grid goes down: 72-hour kits, food and water storage, cash, radios and backup power — what governments actually advise.',
+  },
 ]

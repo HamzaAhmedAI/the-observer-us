@@ -5,6 +5,7 @@
    ============================================================ */
 
 import { getCategories } from '@/lib/cms'
+import { NAV_CATEGORIES } from '@/lib/nav'
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -12,7 +13,17 @@ export const revalidate = 3600
 const ORIGIN = SITE_URL.replace(/\/+$/, '')
 
 export async function GET() {
-  const categories = await getCategories().catch(() => [])
+  // CMS categories when seeded; the fixed nav definition is the fallback
+  // so the file stays complete while the CMS is still empty.
+  const cmsCategories = await getCategories().catch(() => [])
+  const categories =
+    cmsCategories.length > 0
+      ? cmsCategories
+      : NAV_CATEGORIES.map((c) => ({
+          name: c.label,
+          slug: c.slug,
+          description: c.description,
+        }))
 
   const lines: string[] = []
   lines.push(`# ${SITE_NAME}`)
@@ -20,8 +31,9 @@ export async function GET() {
   lines.push(`> ${SITE_DESCRIPTION}`)
   lines.push('')
   lines.push('The Observer US covers Home & Wallet Protection: US home costs, bills and')
-  lines.push('insurance, household recalls, home scams, and data breaches. Each category page')
-  lines.push('lists its latest articles; individual articles are available at /{category}/{slug}.')
+  lines.push('insurance, household recalls, home scams, data breaches, and off-grid')
+  lines.push('preparedness. Each category page lists its latest articles; individual')
+  lines.push('articles are available at /{category}/{slug}.')
   lines.push('')
   lines.push('## News')
   lines.push(`- [Home](${ORIGIN}/): Latest home and wallet protection guides and news.`)

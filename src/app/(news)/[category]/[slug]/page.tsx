@@ -344,12 +344,12 @@ export default async function ArticlePage({ params }: Props) {
               aria-label="Sources and disclosures"
               className="mt-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6"
             >
-              {safe.contentType === 'evergreen-hub' && safe.lastReviewed && (
+              {safe.contentType !== 'news-hook' && safe.lastReviewed && (
                 <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
                   <strong className="text-[var(--color-text-primary)]">Last reviewed:</strong>{' '}
                   {dateFormatter.format(new Date(safe.lastReviewed))} against the official
-                  sources below. Steps change — if a bureau link has moved, use the official
-                  source, not a copy of it.
+                  sources below. Steps and prices change — if an official link has moved, use
+                  the official source, not a copy of it.
                 </p>
               )}
               {safe.sources && safe.sources.length > 0 && (

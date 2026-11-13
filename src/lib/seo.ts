@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const SITE_NAME = 'The Observer US'
 export const SITE_DESCRIPTION =
-  'Protect your home. Protect your wallet. Practical US guides and news on home costs, bills, recalls, scams, and data breaches — what happened, who is affected, and what to do next.'
+  'Protect your home. Protect your wallet. Practical US guides and news on home costs, bills, recalls, scams, data breaches, and off-grid preparedness — what happened, who is affected, and what to do next.'
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? 'https://theobserverus.com'
 export const SITE_TWITTER = '@ObserverUS'
 

@@ -2,7 +2,7 @@
 // Article Types — Core data shapes for the entire platform
 // ============================================================
 
-export type ArticleContentType = 'evergreen-hub' | 'news-hook' | 'tool-guide'
+export type ArticleContentType = 'evergreen-hub' | 'news-hook' | 'tool-guide' | 'comparison' | 'checklist'
 
 export interface ArticleSource {
   label: string

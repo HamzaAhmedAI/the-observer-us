@@ -19,6 +19,8 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: '/advertise', priority: '0.5', changefreq: 'monthly' },
   { path: '/careers', priority: '0.4', changefreq: 'monthly' },
   { path: '/sitemap', priority: '0.3', changefreq: 'weekly' },
+  { path: '/tools', priority: '0.7', changefreq: 'weekly' },
+  { path: '/tools/72-hour-kit', priority: '0.8', changefreq: 'monthly' },
 ]
 
 export async function GET() {

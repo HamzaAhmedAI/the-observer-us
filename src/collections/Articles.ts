@@ -202,12 +202,14 @@ export const Articles: CollectionConfig = {
       options: [
         { label: 'Evergreen hub — action guide, updated over time', value: 'evergreen-hub' },
         { label: 'News hook — one event, links into a hub', value: 'news-hook' },
-        { label: 'Tool / comparison guide — quote, checklist or calculator page', value: 'tool-guide' },
+        { label: 'Tool / calculator — interactive tool page', value: 'tool-guide' },
+        { label: 'Comparison — quote or product comparison page', value: 'comparison' },
+        { label: 'Checklist — downloadable/printable checklist', value: 'checklist' },
       ],
       admin: {
         position: 'sidebar',
         description:
-          'Home & Wallet mix: 40% evergreen hubs, 40% news hooks, 20% tool guides.',
+          'Long-term plan mix: ~50% evergreen hubs, ~25% tools/calculators, ~15% comparison, news ≤10%.',
       },
     },
     {
