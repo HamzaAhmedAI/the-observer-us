@@ -40,11 +40,11 @@ export default function RootLayout({
             all images are served locally; do not re-add picsum here) */}
 
         {/* Prevent FOUC for dark mode — checks localStorage before paint.
-            CSP nonce injected via Next.js config (see next.config.ts).
+            Allowed by the CSP's 'unsafe-inline' in script-src (see
+            middleware.ts) — Next.js hydration needs inline scripts.
             This script runs before hydration and is essential for theme.
         */}
         <script
-          nonce={process.env.__NEXT_CSP_NONCE}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

@@ -14,12 +14,21 @@ export function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV === 'development'
 
   // CSP: strict in production, relaxed in dev for React hot-reload.
-  // NOTE: 'unsafe-inline' is required for React's style injection in dev.
-  // Remove it in production once styles are extracted to CSS files or
-  // a CSS-in-JS solution with nonce support is adopted.
+  // script-src carries 'unsafe-inline' in BOTH environments — this is
+  // deliberate, not an oversight. Next.js App Router emits inline
+  // <script> tags on every page (RSC flight data + the hydration
+  // bootstrap), and without them React never hydrates: buttons,
+  // calculators and checklists render as dead HTML. That is exactly
+  // what happened on 2026-11-13 — the 72-hour kit tool loaded but
+  // nothing on it responded, because production CSP had no inline
+  // allowance and no nonce. The alternative (a per-request nonce)
+  // would force the whole site dynamic (headers() in the root layout
+  // kills ISR/static rendering), which costs more than it saves on a
+  // site with no user-generated content and no browser auth flows.
+  // Everything else stays strict: no eval, no objects, no frames.
   const scriptSrc = isDev
     ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com" // React dev needs eval + inline
-    : "'self' https://www.googletagmanager.com" // Production: no inline/eval; GTM allowed for GA4 (gated by NEXT_PUBLIC_GA_ID)
+    : "'self' 'unsafe-inline' https://www.googletagmanager.com" // Production: inline allowed for Next.js hydration; GTM for GA4 (gated by NEXT_PUBLIC_GA_ID)
 
   const csp = [
     `default-src 'self'`,
