@@ -1,23 +1,23 @@
 /* ============================================================
    The Observer US — Dynamic News Sitemap (Google News)
-   Serves the most recent published articles (no time filter)
-   so Google News can index the full catalog. Cap at 1000
-   URLs (Google News spec). Switch to a 48h window once the
-   site is publishing 50+ articles/day.
+   Google News spec: only articles from the last 48 hours,
+   max 1000 URLs. Older articles stay in the regular sitemap
+   and RSS — they do not belong here.
    ============================================================ */
 
 import { getArticles } from '@/lib/cms'
 import { SITE_URL } from '@/lib/seo'
 
+const NEWS_WINDOW_MS = 48 * 60 * 60 * 1000 // 48 hours
+
 export async function GET() {
-  // Pull the last 1000 published articles (no time filter). Google News
-  // accepts up to 1000 URLs in a news sitemap, and a brand-new site
-  // benefits from showing its full catalog so the crawler can index
-  // the site holistically. Switch to a 48h window once you're
-  // publishing 50+ articles/day.
+  // Pull the last 1000 published articles, then keep only the ones
+  // published in the last 48 hours (Google News spec).
   const articles = await getArticles({ limit: 1000 })
+  const cutoff = Date.now() - NEWS_WINDOW_MS
 
   const newsUrls = articles.data
+    .filter((article) => new Date(article.publishedAt).getTime() >= cutoff)
     .map(
       (article) => `
     <url>
