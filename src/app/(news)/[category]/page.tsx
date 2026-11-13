@@ -7,10 +7,32 @@ import { ArticleCard } from '@/components/reader/ArticleCard'
 import { CategorySidebar } from '@/components/reader/CategorySidebar'
 import { Pagination } from '@/components/reader/Pagination'
 import { getArticles, getCategories } from '@/lib/cms'
+import { NAV_CATEGORIES } from '@/lib/nav'
+import type { Category } from '@/types/article'
 // REVALIDATE_CATEGORY = 600 (inlined for Next.js 16 compatibility)
 import type { Metadata } from 'next'
 
 export const revalidate = 600
+
+// The 5 nav categories are the site's fixed structure (single source of
+// truth in lib/nav.ts). The CMS carries the same categories once seeded,
+// but the page must not 404 while the CMS is still empty — Google follows
+// these URLs from the nav and the sitemap. CMS data wins when present;
+// the nav definition is the fallback. Anything outside the 5 slugs 404s.
+function resolveCategory(categories: Category[], slug: string): Category | undefined {
+  const fromCms = categories.find((c) => c.slug === slug)
+  if (fromCms) return fromCms
+  const fromNav = NAV_CATEGORIES.find((c) => c.slug === slug)
+  if (!fromNav) return undefined
+  return {
+    id: `nav-${fromNav.slug}`,
+    slug: fromNav.slug,
+    name: fromNav.label,
+    description: fromNav.description,
+    color: '',
+    articleCount: 0,
+  }
+}
 
 interface Props {
   params: Promise<{ category: string }>
@@ -27,11 +49,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const categories = await getCategories()
-  const cat = categories.find((c) => c.slug === category)
+  const cat = resolveCategory(categories, category)
 
   return {
     title: `${cat?.name ?? category} News`,
-    description: `Latest ${cat?.name ?? category} news, analysis, and breaking stories.`,
+    description: cat?.description ?? `Latest ${cat?.name ?? category} news, analysis, and breaking stories.`,
   }
 }
 
@@ -51,10 +73,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     getCategories(),
   ])
 
-  const cat = categories.find((c) => c.slug === category)
+  const cat = resolveCategory(categories, category)
 
   // (C1) Unknown category → 404. Without this, /anything-here renders an
   // empty page with HTTP 200, which Google indexes as a real page.
+  // The 5 nav categories always resolve (see resolveCategory above).
   if (!cat) {
     notFound()
   }
