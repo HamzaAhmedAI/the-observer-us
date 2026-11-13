@@ -40,7 +40,13 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 echo "==> npm ci"
-npm ci
+# --include=dev is required: .env sets NODE_ENV=production, and plain
+# `npm ci` under NODE_ENV=production skips devDependencies — including
+# @tailwindcss/postcss and tailwindcss, which the build needs to process
+# globals.css. (This bit the 2026-11-13 deploy: the build failed with
+# "Cannot find module '@tailwindcss/postcss'" while the old site kept
+# running.) The build itself runs with NODE_ENV=production regardless.
+npm ci --include=dev
 echo "==> build"
 npm run build
 echo "==> restart service"
