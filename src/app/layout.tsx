@@ -8,6 +8,7 @@ import { DEFAULT_METADATA, SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/s
 import { Header } from '@/components/ui/Header'
 import { Footer } from '@/components/ui/Footer'
 import { WebVitals } from '@/components/analytics/WebVitals'
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { BreakingBanner } from '@/components/reader/BreakingBanner'
 import { NewsletterPopup } from '@/components/reader/NewsletterPopup'
 import { SiteJsonLd } from '@/components/analytics/JsonLd'
@@ -35,11 +36,8 @@ export default function RootLayout({
           siteDescription={SITE_DESCRIPTION}
         />
 
-        {/* Preconnect to external origins for performance */}
-        <link rel="preconnect" href="https://picsum.photos" />
-        <link rel="dns-prefetch" href="https://picsum.photos" />
-        {/* Replace the href above with your production image CDN hostname:
-             <link rel="preconnect" href="https://cdn.example.com" /> */}
+        {/* Preconnect to external origins for performance (none needed —
+            all images are served locally; do not re-add picsum here) */}
 
         {/* Prevent FOUC for dark mode — checks localStorage before paint.
             CSP nonce injected via Next.js config (see next.config.ts).
@@ -70,6 +68,7 @@ export default function RootLayout({
             <Footer />
           </div>
           <WebVitals />
+          <GoogleAnalytics />
           <NewsletterPopup />
         </FontProvider>
       </body>

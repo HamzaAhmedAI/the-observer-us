@@ -7,7 +7,7 @@ import { logger } from '@/lib/logger'
 
 const INDEXNOW_URL = 'https://api.indexnow.org'
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY ?? ''
-const SITE_URL = process.env.SITE_URL ?? 'https://theObserver.com'
+const SITE_URL = process.env.SITE_URL ?? 'https://theobserverus.com'
 
 /**
  * Notify IndexNow and other search engines of a new or updated URL.

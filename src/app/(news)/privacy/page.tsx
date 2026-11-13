@@ -1,8 +1,9 @@
 /* ============================================================
    The Observer US — Privacy Policy
-   Reflects actual data practices: first-party analytics only,
-   email + web push subscriptions, no third-party ad/tracking,
-   no sale or sharing of personal data.
+   Reflects actual data practices: first-party analytics plus Google
+   Analytics 4 when enabled (IP anonymization on), email + web push
+   subscriptions, no third-party ad/tracking, no sale or sharing of
+   personal data.
    ============================================================ */
 
 import type { Metadata } from 'next'
@@ -13,7 +14,7 @@ import { SITE_NAME } from '@/lib/seo'
 export const metadata: Metadata = {
   title: `Privacy Policy — ${SITE_NAME}`,
   description:
-    'How The Observer US collects, uses, and protects your data. First-party analytics only, no third-party ad tracking, and we never sell your data.',
+    'How The Observer US collects, uses, and protects your data. First-party analytics plus Google Analytics 4 when enabled, no third-party ad tracking, and we never sell your data.',
   alternates: { canonical: '/privacy' },
   robots: { index: true, follow: true },
 }
@@ -72,14 +73,25 @@ export default function PrivacyPage() {
         </p>
         <LegalList>
           <li>
-            <strong className="text-[var(--color-accent)]">First-party analytics only.</strong> We
+            <strong className="text-[var(--color-accent)]">First-party analytics, plus Google Analytics 4 when enabled.</strong> We
             collect anonymous performance and usage metrics (such as page load times, which articles
-            are read, and error reports) through our own servers. We do{' '}
+            are read, and error reports) through our own servers. We also use Google Analytics 4
+            to understand aggregate traffic — with IP anonymization enabled and no advertising
+            personalization. It sets its own cookies (_ga, _ga_*). You can opt out with{' '}
+            <a
+              href="https://tools.google.com/dlpage/gaoptout"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-accent)] hover:underline"
+            >
+              Google&apos;s opt-out add-on
+            </a>
+            . We do{' '}
             <strong className="text-[var(--color-text-primary)]">
               not
             </strong>{' '}
-            load third-party advertising or cross-site tracking cookies (e.g., Google Analytics,
-            Meta Pixel, or ad networks).
+            load third-party advertising networks, social pixels, or cross-site advertising
+            cookies (e.g., Meta Pixel or ad networks).
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Email engagement signals</strong> —
@@ -118,10 +130,12 @@ export default function PrivacyPage() {
       <LegalSection title="5. Cookies and Tracking">
         <p>
           We use a minimal set of first-party cookies to remember your preferences (such as category
-          selections and notification settings). Because we do not use third-party advertising or
-          cross-site tracking cookies, no advertising-consent banner is required under the EU
-          ePrivacy rules for our current setup. If we ever add third-party analytics or advertising,
-          we will update this policy and implement appropriate consent.
+          selections and notification settings). When enabled, Google Analytics 4 sets its own
+          cookies (_ga, _ga_*) for aggregate traffic measurement with IP anonymization; it is not
+          used for advertising. Because we do not use third-party advertising or cross-site
+          advertising cookies, no advertising-consent banner is required under the EU ePrivacy
+          rules for our current setup. If we ever add third-party advertising, we will update this
+          policy and implement appropriate consent.
         </p>
       </LegalSection>
 

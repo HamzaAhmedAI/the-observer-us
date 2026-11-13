@@ -66,7 +66,7 @@ const BORDER_COLOR = '#e2e8f0'
  * Wraps content in a shared email layout.
  */
 function emailLayout(body: string, title: string): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theObserver.com'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theobserverus.com'
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

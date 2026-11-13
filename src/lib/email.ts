@@ -29,7 +29,7 @@ export interface EmailPayload {
  * Send an email via Resend.
  */
 export async function sendEmail(payload: EmailPayload): Promise<void> {
-  const { to, subject, html, from = 'The Observer US <newsletter@theObserver.com>' } = payload
+  const { to, subject, html, from = 'The Observer US <newsletter@theobserverus.com>' } = payload
   const resend = getResend()
 
   try {

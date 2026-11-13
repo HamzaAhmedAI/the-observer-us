@@ -39,21 +39,27 @@ export async function POST(request: Request) {
       dispatchResults.google = 'skipped'
     }
 
-    // 2. IndexNow ping
-    try {
-      await fetch('https://api.indexnow.org', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          host: new URL(SITE_URL).hostname,
-          key: process.env.INDEXNOW_KEY ?? '',
-          urlList: [articleUrl],
-        }),
-      })
-      dispatchResults.indexnow = 'pinged'
-    } catch {
-      logger.warn('[Notify] IndexNow ping failed — skipping.')
-      dispatchResults.indexnow = 'skipped'
+    // 2. IndexNow ping (skipped until INDEXNOW_KEY is configured —
+    // the key file lives at /{INDEXNOW_KEY}.txt on the site).
+    if (process.env.INDEXNOW_KEY) {
+      try {
+        await fetch('https://api.indexnow.org', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            host: new URL(SITE_URL).hostname,
+            key: process.env.INDEXNOW_KEY ?? '',
+            keyLocation: `${SITE_URL}/${process.env.INDEXNOW_KEY}.txt`,
+            urlList: [articleUrl],
+          }),
+        })
+        dispatchResults.indexnow = 'pinged'
+      } catch {
+        logger.warn('[Notify] IndexNow ping failed — skipping.')
+        dispatchResults.indexnow = 'skipped'
+      }
+    } else {
+      dispatchResults.indexnow = 'no-key-configured'
     }
 
     // 3. Push notifications to category subscribers

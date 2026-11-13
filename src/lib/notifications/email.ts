@@ -56,7 +56,7 @@ export async function dispatchBreakingNewsEmail(
   const emailAddresses = matching.map((s) => s.email)
   const substitutedHtml = html.replace(
     /{{unsubscribe_url}}/g,
-    `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theObserver.com'}/unsubscribe`
+    `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theobserverus.com'}/unsubscribe`
   )
 
   try {
@@ -107,7 +107,7 @@ export async function dispatchDailyDigest(
   const html = buildDigestEmail(date, articles)
   const substitutedHtml = html.replace(
     /{{unsubscribe_url}}/g,
-    `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theObserver.com'}/unsubscribe`
+    `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theobserverus.com'}/unsubscribe`
   )
 
   const emailAddresses = subscribers.map((s) => s.email)

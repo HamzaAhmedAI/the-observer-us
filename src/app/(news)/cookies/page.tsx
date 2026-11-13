@@ -11,7 +11,7 @@ import { SITE_NAME } from '@/lib/seo'
 export const metadata: Metadata = {
   title: `Cookie Policy — ${SITE_NAME}`,
   description:
-    'How The Observer US uses first-party cookies. We do not use third-party advertising or cross-site tracking cookies.',
+    'How The Observer US uses cookies: first-party functional cookies, plus Google Analytics 4 cookies when analytics is enabled. No third-party advertising or cross-site tracking cookies.',
   alternates: { canonical: '/cookies' },
   robots: { index: true, follow: true },
 }
@@ -22,8 +22,8 @@ export default function CookiesPage() {
   return (
     <LegalPage
       title="Cookie Policy"
-      intro="This page explains the cookies The Observer US uses. In short: we use only first-party, functional cookies — not third-party advertising or cross-site tracking cookies."
-      lastUpdated="August 21, 2026"
+      intro="This page explains the cookies The Observer US uses. In short: first-party functional cookies, plus Google Analytics 4 cookies when analytics is enabled — no third-party advertising or cross-site tracking cookies."
+      lastUpdated="November 13, 2026"
     >
       <LegalSection title="What Are Cookies">
         <p>
@@ -40,11 +40,17 @@ export default function CookiesPage() {
           service as you expect.
         </p>
         <p>
-          <strong className="text-[var(--color-text-primary)]">No third-party tracking.</strong> We do
-          not load third-party advertising networks, social pixels, or cross-site analytics cookies
-          (such as Google Analytics or Meta Pixel). Because we don&apos;t use non-essential
-          third-party cookies, no separate advertising-consent banner is required under the EU
-          ePrivacy rules for our current setup.
+          <strong className="text-[var(--color-text-primary)]">Google Analytics 4 (when enabled).</strong> We
+          use Google Analytics 4 to understand aggregate traffic, with IP anonymization enabled.
+          It sets its own cookies (_ga, _ga_*) and is not used for advertising. It is off until
+          a measurement ID is configured; until then, no third-party analytics cookies are set.
+        </p>
+        <p>
+          <strong className="text-[var(--color-text-primary)]">No third-party advertising.</strong> We do
+          not load third-party advertising networks, social pixels, or cross-site advertising cookies
+          (such as Meta Pixel). Because we don&apos;t use non-essential advertising cookies, no
+          separate advertising-consent banner is required under the EU ePrivacy rules for our
+          current setup.
         </p>
       </LegalSection>
 

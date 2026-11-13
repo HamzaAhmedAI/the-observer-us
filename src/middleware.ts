@@ -18,8 +18,8 @@ export function middleware(request: NextRequest) {
   // Remove it in production once styles are extracted to CSS files or
   // a CSS-in-JS solution with nonce support is adopted.
   const scriptSrc = isDev
-    ? "'self' 'unsafe-inline' 'unsafe-eval'"  // React dev needs eval + inline
-    : "'self'"                                 // Production: no inline/eval
+    ? "'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com" // React dev needs eval + inline
+    : "'self' https://www.googletagmanager.com" // Production: no inline/eval; GTM allowed for GA4 (gated by NEXT_PUBLIC_GA_ID)
 
   const csp = [
     `default-src 'self'`,

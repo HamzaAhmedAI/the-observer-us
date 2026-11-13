@@ -90,7 +90,7 @@ export function buildTrackingPixel(
   category?: string,
   articleSlug?: string
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theObserver.com'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theobserverus.com'
   const params = new URLSearchParams({
     type: eventType,
     ...(category && { category }),

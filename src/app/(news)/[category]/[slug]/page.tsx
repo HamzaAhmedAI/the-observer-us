@@ -49,7 +49,7 @@ function ensureArticleMetadata(article: Awaited<ReturnType<typeof getArticleBySl
 
   // Ensure featuredImage has all required fields for JsonLd
   const featuredImage = article.featuredImage ?? {
-    url: 'https://picsum.photos/seed/placeholder/1200/675',
+    url: `${SITE_URL}/images/placeholder-1200x675.png`,
     width: 1200,
     height: 675,
     alt: article.title ?? 'Article image',
@@ -85,11 +85,11 @@ export async function generateStaticParams() {
 }
 
 interface Props {
-  params: { category: string; slug: string }
+  params: Promise<{ category: string; slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category, slug } = params
+  const { category, slug } = await params
 
   // ─── Defense-in-depth URL parameter validation ────────────────────────────
   // Same validation as in ArticlePage - keeps metadata generation safe
@@ -160,7 +160,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage({ params }: Props) {
-  const { category, slug } = params
+  const { category, slug } = await params
 
   // ─── Defense-in-depth URL parameter validation ────────────────────────────
   // Validate that URL parameters conform to safe patterns before use.

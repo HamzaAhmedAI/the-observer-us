@@ -24,11 +24,11 @@ async function loadFont(family: string, weight: string): Promise<ArrayBuffer> {
 }
 
 interface Props {
-  params: { category: string; slug: string }
+  params: Promise<{ category: string; slug: string }>
 }
 
 export default async function OpenGraphImage({ params }: Props) {
-  const { category, slug } = params
+  const { category, slug } = await params
   const article = await getArticleBySlug(category, slug)
 
   const title = article?.title ?? 'Article Not Found'

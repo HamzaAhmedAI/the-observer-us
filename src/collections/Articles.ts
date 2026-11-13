@@ -27,6 +27,85 @@ export const Articles: CollectionConfig = {
     drafts: true,
     maxPerDoc: 20,
   },
+  hooks: {
+    // Publish pipeline — 2026 blogging standard: the moment an article
+    // goes live, (1) revalidate the article/category/homepage caches and
+    // (2) on first publish only, dispatch indexing pings + subscriber
+    // notifications. Fire-and-forget: a failed ping must never break
+    // saving in the admin. Nothing happens for drafts.
+    afterChange: [
+      async ({ doc, previousDoc, req }) => {
+        try {
+          if (doc?._status !== 'published') return doc
+          const baseUrl =
+            process.env.CMS_API_URL ??
+            process.env.SITE_URL ??
+            'http://localhost:3001'
+          const secret = process.env.REVALIDATION_SECRET
+          if (!secret) {
+            req.payload.logger.warn(
+              '[Publish] REVALIDATION_SECRET not set — skipping revalidate/notify.'
+            )
+            return doc
+          }
+
+          // Resolve the category slug (relationship is an ID in hooks).
+          let categorySlug: string | null = null
+          const cat = doc.category as unknown
+          if (cat && typeof cat === 'object' && 'slug' in (cat as Record<string, unknown>)) {
+            categorySlug = (cat as { slug: string }).slug
+          } else if (cat) {
+            try {
+              const categoryDoc = await req.payload.findByID({
+                collection: 'categories',
+                id: cat as string,
+              })
+              categorySlug = (categoryDoc as { slug?: string })?.slug ?? null
+            } catch {
+              categorySlug = null
+            }
+          }
+          if (!categorySlug || !doc.slug) return doc
+
+          const post = (path: string, body: Record<string, unknown>) =>
+            fetch(`${baseUrl}${path}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${secret}`,
+              },
+              body: JSON.stringify(body),
+            }).catch((err) => {
+              req.payload.logger.error(`[Publish] ${path} failed: ${err instanceof Error ? err.message : String(err)}`)
+            })
+
+          // (1) Revalidate on every published save (edits included).
+          void post('/api/revalidate', {
+            category: categorySlug,
+            slug: doc.slug,
+            secret,
+          })
+
+          // (2) Notify (indexing + subscribers) only on first publish.
+          if (previousDoc?._status !== 'published') {
+            void post('/api/notify', {
+              article: {
+                slug: doc.slug,
+                category: categorySlug,
+                title: doc.title,
+                isBreaking: doc.isBreaking ?? false,
+                thumbnailUrl: undefined,
+              },
+              secret,
+            })
+          }
+        } catch (err) {
+          req.payload.logger.error(`[Publish] afterChange hook failed: ${err instanceof Error ? err.message : String(err)}`)
+        }
+        return doc
+      },
+    ],
+  },
   fields: [
     {
       name: 'title',

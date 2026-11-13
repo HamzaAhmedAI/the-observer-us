@@ -106,14 +106,21 @@ export default async function SitemapPage() {
 
       <footer className="mt-12 border-t border-[var(--color-border)] pt-6 text-sm text-[var(--color-text-secondary)]">
         <p>
-          Machine-readable sitemap:{' '}
+          Machine-readable sitemaps:{' '}
+          <a
+            href="/sitemap.xml"
+            className="text-[var(--color-brand)] hover:underline"
+          >
+            /sitemap.xml
+          </a>{' '}
+          (pages) ·{' '}
           <a
             href="/news-sitemap.xml"
             className="text-[var(--color-brand)] hover:underline"
           >
             /news-sitemap.xml
           </a>{' '}
-          · RSS feed:{' '}
+          (articles) · RSS feed:{' '}
           <a
             href="/rss.xml"
             className="text-[var(--color-brand)] hover:underline"

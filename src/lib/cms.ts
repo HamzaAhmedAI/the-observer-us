@@ -11,6 +11,7 @@ import type { Article, Author, Category, Media, PaginatedResponse } from '@/type
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { NAV_CATEGORIES } from '@/lib/nav'
+import { SITE_URL } from '@/lib/seo'
 
 // Payload 3.87.1's REST query-string `where` parser is broken for several
 // field paths (e.g. `where[slug]`, `where[isFeatured]`, `where[category.slug]`
@@ -58,7 +59,7 @@ function normalizeTags<T extends Article>(a: T): T {
 function normalizeMedia(m: Media | null | undefined): Media {
   if (!m || !m.url) {
     return {
-      url: 'https://picsum.photos/seed/placeholder/1200/675',
+      url: `${SITE_URL}/images/placeholder-1200x675.png`,
       width: 1200,
       height: 675,
       alt: 'Placeholder image',

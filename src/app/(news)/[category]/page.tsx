@@ -13,12 +13,12 @@ import type { Metadata } from 'next'
 export const revalidate = 600
 
 interface Props {
-  params: { category: string }
+  params: Promise<{ category: string }>
   searchParams: Promise<{ page?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category } = params
+  const { category } = await params
 
   // ─── Defense-in-depth URL parameter validation ────────────────────
   const VALID_CATEGORY = /^[a-z][a-z0-9-]*$/
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
-  const { category } = params
+  const { category } = await params
   const { page: pageStr } = await searchParams
   const page = Number(pageStr) || 1
 
