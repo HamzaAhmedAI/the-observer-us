@@ -32,7 +32,9 @@ function loadEnvFile(file) {
 }
 const env = loadEnvFile(path.resolve(process.cwd(), '../.env.seed'))
 
-const IMAGES = ['featured-credit-freeze-hub.jpg', 'featured-greystar-letter.jpg']
+const IMAGES = process.argv.slice(2).length > 0
+  ? process.argv.slice(2)
+  : ['featured-credit-freeze-hub.jpg', 'featured-greystar-letter.jpg']
 
 for (const filename of IMAGES) {
   const src = path.join(MEDIA_DIR, filename)
