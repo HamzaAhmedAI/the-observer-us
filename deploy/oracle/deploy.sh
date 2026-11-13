@@ -44,7 +44,13 @@ npm ci
 echo "==> build"
 npm run build
 echo "==> restart service"
-sudo systemctl restart the-observer
+# Retry once: a restart issued immediately after a build can rarely fail
+# with a transient polkit error ("Interactive authentication required").
+if ! sudo systemctl restart the-observer; then
+  echo "==> restart failed once — retrying in 3s"
+  sleep 3
+  sudo systemctl restart the-observer
+fi
 echo "==> done. Check: journalctl -u the-observer -f"
 
 # NOTE: schema migrations are NOT run here yet. `payload migrate` cannot
