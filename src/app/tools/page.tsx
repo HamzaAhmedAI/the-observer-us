@@ -24,8 +24,17 @@ const TOOLS = [
     href: '/tools/72-hour-kit',
     title: '72-Hour Emergency Kit Calculator',
     category: 'Off-Grid Life',
+    color: 'var(--color-off-grid-life)',
     description:
       'How much water and food does your household need for 72 hours — or 7, 10 or 14 days? Calculate it in seconds, then tick off the full kit checklist: radio, batteries, cash, documents and more.',
+  },
+  {
+    href: '/tools/home-insurance-cost',
+    title: 'Home Insurance Cost Calculator',
+    category: 'Bills & Insurance',
+    color: 'var(--color-bills-insurance)',
+    description:
+      'What should home insurance cost for your house? Estimate your replacement cost and annual premium range from published rebuild costs and industry rates — with the math shown, and an honest range instead of a fake exact number.',
   },
 ]
 
@@ -49,7 +58,10 @@ export default function ToolsPage() {
             href={tool.href}
             className="group rounded-lg border border-[var(--color-border)] p-6 no-underline transition-colors hover:border-[var(--color-accent)]"
           >
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[var(--color-off-grid-life)]">
+            <p
+              className="mb-2 text-xs font-bold uppercase tracking-wider"
+              style={{ color: tool.color }}
+            >
               {tool.category}
             </p>
             <h2 className="mb-2 text-xl font-bold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] group-hover:underline">
@@ -63,8 +75,7 @@ export default function ToolsPage() {
       </div>
 
       <p className="mt-8 text-sm text-[var(--color-text-tertiary)]">
-        More tools are coming — a home insurance cost calculator and a food-storage planner
-        are next in the plan.
+        More tools are coming — a food-storage planner is next in the plan.
       </p>
     </div>
   )
