@@ -10,6 +10,11 @@ import { SITE_URL } from '@/lib/seo'
 import { NAV_CATEGORIES } from '@/lib/nav'
 import { getArticles } from '@/lib/cms'
 
+// Render on every request, like the news sitemap: a static build-time
+// snapshot goes stale the moment a new article publishes (the cron
+// publishes twice a day, no rebuild in between).
+export const dynamic = 'force-dynamic'
+
 const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }> = [
   { path: '/', priority: '1.0', changefreq: 'hourly' },
   { path: '/about', priority: '0.6', changefreq: 'monthly' },
