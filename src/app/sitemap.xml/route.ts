@@ -1,12 +1,14 @@
 /* ============================================================
    The Observer US — Pages Sitemap (/sitemap.xml)
-   Static pages + category feeds. Articles live in
-   /news-sitemap.xml (Google News format). Both are listed
-   in robots.txt so crawlers find the full site.
+   Static pages + category feeds + ALL published articles.
+   The news sitemap only keeps the last 48 hours, so articles
+   must live here too — otherwise anything older than 48h is
+   in no sitemap at all and Google has to find it by links alone.
    ============================================================ */
 
 import { SITE_URL } from '@/lib/seo'
 import { NAV_CATEGORIES } from '@/lib/nav'
+import { getArticles } from '@/lib/cms'
 
 const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }> = [
   { path: '/', priority: '1.0', changefreq: 'hourly' },
@@ -21,10 +23,12 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: '/sitemap', priority: '0.3', changefreq: 'weekly' },
   { path: '/tools', priority: '0.7', changefreq: 'weekly' },
   { path: '/tools/72-hour-kit', priority: '0.8', changefreq: 'monthly' },
+  { path: '/tools/home-insurance-cost', priority: '0.8', changefreq: 'monthly' },
 ]
 
 export async function GET() {
   const now = new Date().toISOString()
+  const articles = await getArticles({ limit: 1000 })
 
   const urls = [
     ...STATIC_PAGES.map(
@@ -43,6 +47,15 @@ export async function GET() {
       <lastmod>${now}</lastmod>
       <changefreq>hourly</changefreq>
       <priority>0.8</priority>
+    </url>`
+    ),
+    ...articles.data.map(
+      (article) => `
+    <url>
+      <loc>${SITE_URL}/${article.category.slug}/${article.slug}</loc>
+      <lastmod>${article.publishedAt}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.7</priority>
     </url>`
     ),
   ].join('')
