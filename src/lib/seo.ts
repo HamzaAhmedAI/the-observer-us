@@ -28,6 +28,13 @@ export const DEFAULT_METADATA: Metadata = {
     'max-image-preview': 'large',
     'max-snippet': -1,
   },
+  // Pinterest domain verification for the business account
+  // (The Observer US • @kalveenken) — added 2026-11-17.
+  verification: {
+    other: {
+      'p:domain_verify': '0a6a7f074e4631710b8cc7be9b7b8921',
+    },
+  },
   alternates: {
     canonical: '/',
     types: {
