@@ -2,8 +2,9 @@
    The Observer US — Privacy Policy
    Reflects actual data practices: first-party analytics plus Google
    Analytics 4 when enabled (IP anonymization on), email + web push
-   subscriptions, no third-party ad/tracking, no sale or sharing of
-   personal data.
+   subscriptions, Google AdSense advertising (third-party cookies;
+   personalised ads only with consent in the EEA/UK), no sale or
+   sharing of personal data.
    ============================================================ */
 
 import type { Metadata } from 'next'
@@ -14,7 +15,7 @@ import { SITE_NAME } from '@/lib/seo'
 export const metadata: Metadata = {
   title: `Privacy Policy — ${SITE_NAME}`,
   description:
-    'How The Observer US collects, uses, and protects your data. First-party analytics plus Google Analytics 4 when enabled, no third-party ad tracking, and we never sell your data.',
+    'How The Observer US collects, uses, and protects your data. First-party analytics plus Google Analytics 4, Google AdSense advertising with third-party cookies, and we never sell your data.',
   alternates: { canonical: '/privacy' },
   robots: { index: true, follow: true },
 }
@@ -26,7 +27,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       intro="This policy explains what information The Observer US collects, how we use it, and the choices you have. We keep it plain and honest."
-      lastUpdated="August 21, 2026"
+      lastUpdated="November 19, 2026"
     >
       <LegalSection title="1. Who We Are">
         <p>
@@ -86,12 +87,32 @@ export default function PrivacyPage() {
             >
               Google&apos;s opt-out add-on
             </a>
-            . We do{' '}
-            <strong className="text-[var(--color-text-primary)]">
-              not
-            </strong>{' '}
-            load third-party advertising networks, social pixels, or cross-site advertising
-            cookies (e.g., Meta Pixel or ad networks).
+            . We do not load other third-party advertising networks or social pixels.
+          </li>
+          <li>
+            <strong className="text-[var(--color-accent)]">Google AdSense advertising.</strong> We
+            show ads served by Google AdSense. Google and its partners use cookies (including the
+            DoubleClick advertising cookie) to serve ads based on your visits to this site and
+            other sites, and may personalise ads using your interests. You can opt out of
+            personalised advertising in{' '}
+            <a
+              href="https://adssettings.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-accent)] hover:underline"
+            >
+              Google Ads Settings
+            </a>{' '}
+            and read how Google uses data from partner sites at{' '}
+            <a
+              href="https://policies.google.com/technologies/partner-sites"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-accent)] hover:underline"
+            >
+              policies.google.com/technologies/partner-sites
+            </a>
+            .
           </li>
           <li>
             <strong className="text-[var(--color-text-primary)]">Email engagement signals</strong> —
@@ -122,8 +143,8 @@ export default function PrivacyPage() {
             cross-context behavioral advertising.
           </strong>{' '}
           We do not use data brokers. The only disclosures are to vetted service providers who help
-          us operate (such as our hosting and email-delivery infrastructure), and only as needed to
-          provide the service.
+          us operate (such as our hosting and email-delivery infrastructure, and Google as our
+          advertising partner — see Section 2), and only as needed to provide the service.
         </p>
       </LegalSection>
 
@@ -132,10 +153,9 @@ export default function PrivacyPage() {
           We use a minimal set of first-party cookies to remember your preferences (such as category
           selections and notification settings). When enabled, Google Analytics 4 sets its own
           cookies (_ga, _ga_*) for aggregate traffic measurement with IP anonymization; it is not
-          used for advertising. Because we do not use third-party advertising or cross-site
-          advertising cookies, no advertising-consent banner is required under the EU ePrivacy
-          rules for our current setup. If we ever add third-party advertising, we will update this
-          policy and implement appropriate consent.
+          used for advertising. We also show ads through Google AdSense, which sets third-party
+          advertising cookies (see Section 2). Personalised ads are only shown to visitors in the
+          EEA or UK with their consent.
         </p>
       </LegalSection>
 
