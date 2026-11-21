@@ -16,11 +16,21 @@ import { RelatedArticles } from '@/components/reader/RelatedArticles'
 import { MostRead } from '@/components/reader/MostRead'
 import { RelativeTime } from '@/components/reader/RelativeTime'
 import { ViewBeacon } from '@/components/analytics/ViewBeacon'
+import { ChecklistOptIn } from '@/components/reader/ChecklistOptIn'
 import { SITE_NAME, SITE_URL } from '@/lib/seo'
 import { isLive } from '@/lib/relative-time'
 import type { Metadata } from 'next'
 
 export const revalidate = 3600
+
+// Articles that carry the checklist lead magnet (Week 1 growth plan).
+// The form sits right after the intro (excerpt + featured image).
+const CHECKLIST_ARTICLES = new Set([
+  'how-to-freeze-your-credit-at-all-three-bureaus-free',
+  'what-to-do-after-a-data-breach',
+  'what-does-home-insurance-cover',
+  'how-to-build-a-72-hour-emergency-kit',
+])
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   weekday: 'long',
@@ -329,6 +339,11 @@ export default async function ArticlePage({ params }: Props) {
               priority
             />
           </div>
+
+          {/* Checklist lead magnet — only on the selected articles */}
+          {CHECKLIST_ARTICLES.has(safe.slug) && (
+            <ChecklistOptIn category={safe.category.slug} />
+          )}
 
           {/* Article Body */}
           <div
