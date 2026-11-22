@@ -36,6 +36,14 @@ const TOOLS = [
     description:
       'What should home insurance cost for your house? Estimate your replacement cost and annual premium range from published rebuild costs and industry rates — with the math shown, and an honest range instead of a fake exact number.',
   },
+  {
+    href: '/tools/food-storage-planner',
+    title: 'Food Storage Planner',
+    category: 'Off-Grid Life',
+    color: 'var(--color-off-grid-life)',
+    description:
+      'How much water, food and calories does your household need for 3, 7, 14 or 30 days? Work out the gallons, pounds and total calories from official guidance, then tick off the shopping checklist — no-cook food first, bulk staples second.',
+  },
 ]
 
 export default function ToolsPage() {
@@ -75,7 +83,7 @@ export default function ToolsPage() {
       </div>
 
       <p className="mt-8 text-sm text-[var(--color-text-tertiary)]">
-        More tools are coming — a food-storage planner is next in the plan.
+        More tools are coming.
       </p>
     </div>
   )

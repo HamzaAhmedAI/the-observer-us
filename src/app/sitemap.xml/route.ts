@@ -29,6 +29,7 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: '/tools', priority: '0.7', changefreq: 'weekly' },
   { path: '/tools/72-hour-kit', priority: '0.8', changefreq: 'monthly' },
   { path: '/tools/home-insurance-cost', priority: '0.8', changefreq: 'monthly' },
+  { path: '/tools/food-storage-planner', priority: '0.8', changefreq: 'monthly' },
 ]
 
 export async function GET() {
