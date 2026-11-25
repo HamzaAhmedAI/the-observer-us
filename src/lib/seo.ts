@@ -33,6 +33,7 @@ export const DEFAULT_METADATA: Metadata = {
   verification: {
     other: {
       'p:domain_verify': '0a6a7f074e4631710b8cc7be9b7b8921',
+      'google-adsense-account': 'ca-pub-2326700812284387',
     },
   },
   alternates: {
